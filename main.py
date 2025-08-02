@@ -3,23 +3,15 @@ from playwright.sync_api import sync_playwright
 from config import load_config
 from navigation import navigate_to_exam, select_module, navigate_to_actual_exam_page, complete_exam
 from browser import click_answer, click_next, submit_exam
-from ocr import extract_text_from_pics_and_get_score
 from algorithm import load_question_data, select_answers, save_attempt_data, update_attempts
 import threading
 import time
 import os
 
 def run_ocr_in_background():
-    """Run the OCR process in a separate thread."""
-    logging.info("Starting OCR process in background thread...")
-    try:
-        score = extract_text_from_pics_and_get_score()
-        if score is not None:
-            logging.info(f"[RESULT] Final score from OCR: {score}/30")
-        else:
-            logging.error("OCR could not determine the score from screenshots.")
-    except Exception as e:
-        logging.error(f"Error in OCR background thread: {e}")
+    """Run the OCR process in a separate thread (deactivated)."""
+    logging.info("OCR process is deactivated.")
+    return
 
 def run_exam_automation() -> None:
     """Orchestrate the exam automation process, coordinating all modules."""
@@ -49,11 +41,7 @@ def run_exam_automation() -> None:
         # Complete the exam using the test_answers list
         from navigation import test_answers
         complete_exam(page, test_answers)
-        # Start OCR in a separate thread
-        ocr_thread = threading.Thread(target=run_ocr_in_background, daemon=True)
-        ocr_thread.start()
-        logging.info("OCR process started in background. Continuing with script execution...")
-        logging.info("Exam automation complete. Browser will remain open.")
+        
 
 if __name__ == "__main__":
     run_exam_automation()

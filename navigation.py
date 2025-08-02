@@ -44,6 +44,7 @@ def submit_exam(page):
     try:
         page.get_by_role('button', name='Submit').click(timeout=1000)
         logging.info("Clicked 'Submit' button (by role).")
+
     except Exception:
         logging.warning("Could not find 'Submit' button (by role).")
 
@@ -58,6 +59,12 @@ def submit_exam(page):
 
         if count >= 2:
             submit_buttons.nth(1).click(timeout=1000)
+
+            # Extract exam result after completion
+            from extract_result import extract_exam_result
+            result = extract_exam_result(page)
+            logging.info(f"Exam result extracted: {result}")
+            
             logging.info("Clicked second 'Submit' button (confirmation).")
         elif count == 1:
             submit_buttons.nth(0).click(timeout=1000)
@@ -99,9 +106,7 @@ def complete_exam(page, answers):
         click_answer_by_index(page, answer_index)
         if not click_next(page):
             logging.info("'Next >' button not found. Submitting exam immediately...")
-            take_exam_screenshots(page)
             submit_exam(page)
-            run_ocr_and_cleanup()
             return
     
 
