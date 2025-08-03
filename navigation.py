@@ -6,6 +6,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 import ollama
 
 exam_page_url = None
+selected_module_name = None  # Global declaration
 
 
 def click_answer_by_index(page, answer_index):
@@ -37,24 +38,17 @@ def click_next(page):
         return False
 
 def submit_exam(page):
-    """Submit the exam using robust logic and AI fallback."""
-    logging.info("Submitting exam...")
+    """Submit the exam and restart it in a loop."""
+    while True:
+        logging.info("Submitting exam...")
 
-    # First Submit button (main page)
-    try:
         page.get_by_role('button', name='Submit').click(timeout=1000)
         logging.info("Clicked 'Submit' button (by role).")
-    except Exception:
-        logging.warning("Could not find 'Submit' button (by role).")
 
-    # Wait for confirmation button to appear (if needed)
-    page.wait_for_timeout(1000)
+        page.wait_for_timeout(1000)
 
-    # Second Submit button (confirmation dialog)
-    try:
         submit_buttons = page.locator('button', has_text='Submit')
         count = submit_buttons.count()
-        logging.info(f"Found {count} 'Submit' buttons.")
 
         if count >= 2:
             submit_buttons.nth(1).click(timeout=1000)
@@ -63,47 +57,40 @@ def submit_exam(page):
             submit_buttons.nth(0).click(timeout=1000)
             logging.info("Clicked only available 'Submit' button.")
         else:
-            logging.warning("No 'Submit' button found in fallback locator.")
-            return  # Exit early if nothing to click
+            logging.warning("No 'Submit' button found.")
+            return
 
-        time.sleep(2)  # Allow time for any final processing
+        time.sleep(2)
 
-        # Extract result after submission
         from extract_result import extract_exam_result
         result = extract_exam_result(page)
         logging.info(f"Exam result extracted: {result}")
 
-        # === Restart exam logic ===
+        restart_exam(page)
 
-        # === Restart exam logic ===
+def restart_exam(page):
+    """Restart the exam after submission."""
+    global selected_module_name
+    exam_button_name = f"Final Exam {selected_module_name} batch"
 
-        global selected_module_name  # Ensure this is set earlier
+    logging.info("Restarting exam process...")
 
-        # Click 'View Lesson'
-        page.get_by_text('View Lesson').click()
-        logging.info("Clicked 'View Lesson'.")
+    page.get_by_text('View Lesson').click()
+    logging.info("Clicked 'View Lesson'.")
 
-        # Click 'Final Exam {module name} batch'
-        exam_button_name = f"Final Exam {selected_module_name} batch"
-        page.get_by_text(exam_button_name, exact=False).click()
-        logging.info(f"Clicked '{exam_button_name}'.")
+    page.get_by_text(exam_button_name, exact=False).click()
+    logging.info(f"Clicked '{exam_button_name}'.")
 
-        # Click the exam batch option paragraph
-        page.get_by_text(exam_button_name, exact=False).click()
-        logging.info(f"Clicked paragraph option for '{exam_button_name}'.")
+    page.get_by_text(exam_button_name, exact=False).click()
+    logging.info(f"Clicked paragraph option for '{exam_button_name}'.")
 
-        # Click 'Exam Again' button
-        page.get_by_text("Exam Again", exact=False).click()
-        logging.info("Clicked 'Exam Again' button.")
+    page.get_by_text("Exam Again", exact=False).click()
+    logging.info("Clicked 'Exam Again' button.")
 
-        # Click 'EN' button (exact match)
-        page.get_by_text("EN", exact=True).click()
-        logging.info("Clicked 'EN' button.")
-        time.sleep(3)
+    page.get_by_text("EN", exact=True).click()
+    logging.info("Clicked 'EN' button.")
+    time.sleep(3)
 
-
-    except Exception as e:
-        logging.error(f"Error clicking 'Submit' button or navigating: {e}")
 
 
 
@@ -222,7 +209,7 @@ def navigate_to_actual_exam_page(page, selected_module_name):
 
 def select_module(page):
     """Extract available modules, display them, and prompt user to select one."""
-    
+    global selected_module_name
     modules = [f"Module {i}" for i in range(1, 8)]
     print("Available modules:")
     for idx, name in enumerate(modules, 1):
@@ -231,21 +218,17 @@ def select_module(page):
         try:
             choice = int(input("Enter the number of the module you want to use: ")) - 1
             if 0 <= choice < len(modules):
-                selected_name = modules[choice]
-                print(f"You selected: {selected_name}")
-                logging.info(f"User selected module: {selected_name}")
-                # Use locator template to click correct module
-                try:
-                    page.locator('div').filter(has_text=selected_name).nth(1).click()
-                    logging.info(f"Clicked on module card using locator: {selected_name}")
-                    return selected_name
-                except Exception as e:
-                    logging.error(f"Could not click module card for: {selected_name}. Error: {e}")
-                    return None
+                selected_module_name = modules[choice]  # Assign to global variable
+                print(f"You selected: {selected_module_name}")
+                logging.info(f"User selected module: {selected_module_name}")
+                page.locator('div').filter(has_text=selected_module_name).nth(1).click()
+                logging.info(f"Clicked on module card using locator: {selected_module_name}")
+                return selected_module_name
             else:
                 print("Invalid selection. Please try again.")
         except ValueError:
             print("Please enter a valid number.")
+
 
 
 def get_selector_suggestion(page, target_description):
