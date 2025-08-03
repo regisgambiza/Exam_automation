@@ -5,8 +5,8 @@ from playwright.sync_api import Page
 from tenacity import retry, stop_after_attempt, wait_fixed
 import ollama
 
-# Example list of answer indices for testing (20 questions, random choices)
-test_answers = [1, 2, 3, 4, 2, 1, 4, 3, 2, 1, 3, 4, 2, 1, 4, 3, 2, 1, 3, 4,1, 2, 3, 4, 2, 1, 4, 3, 2, 1]
+exam_page_url = None
+
 
 def click_answer_by_index(page, answer_index):
     """Click the answer button by index, with AI fallback."""
@@ -44,7 +44,6 @@ def submit_exam(page):
     try:
         page.get_by_role('button', name='Submit').click(timeout=1000)
         logging.info("Clicked 'Submit' button (by role).")
-
     except Exception:
         logging.warning("Could not find 'Submit' button (by role).")
 
@@ -59,44 +58,54 @@ def submit_exam(page):
 
         if count >= 2:
             submit_buttons.nth(1).click(timeout=1000)
-
-            # Extract exam result after completion
-            from extract_result import extract_exam_result
-            result = extract_exam_result(page)
-            logging.info(f"Exam result extracted: {result}")
-            
             logging.info("Clicked second 'Submit' button (confirmation).")
         elif count == 1:
             submit_buttons.nth(0).click(timeout=1000)
             logging.info("Clicked only available 'Submit' button.")
         else:
             logging.warning("No 'Submit' button found in fallback locator.")
+            return  # Exit early if nothing to click
+
+        time.sleep(2)  # Allow time for any final processing
+
+        # Extract result after submission
+        from extract_result import extract_exam_result
+        result = extract_exam_result(page)
+        logging.info(f"Exam result extracted: {result}")
+
+        # === Restart exam logic ===
+
+        # === Restart exam logic ===
+
+        global selected_module_name  # Ensure this is set earlier
+
+        # Click 'View Lesson'
+        page.get_by_text('View Lesson').click()
+        logging.info("Clicked 'View Lesson'.")
+
+        # Click 'Final Exam {module name} batch'
+        exam_button_name = f"Final Exam {selected_module_name} batch"
+        page.get_by_text(exam_button_name, exact=False).click()
+        logging.info(f"Clicked '{exam_button_name}'.")
+
+        # Click the exam batch option paragraph
+        page.get_by_text(exam_button_name, exact=False).click()
+        logging.info(f"Clicked paragraph option for '{exam_button_name}'.")
+
+        # Click 'Exam Again' button
+        page.get_by_text("Exam Again", exact=False).click()
+        logging.info("Clicked 'Exam Again' button.")
+
+        # Click 'EN' button (exact match)
+        page.get_by_text("EN", exact=True).click()
+        logging.info("Clicked 'EN' button.")
+        time.sleep(3)
+
+
     except Exception as e:
-        logging.error(f"Error clicking second 'Submit' button: {e}")
-
-    logging.info("Exam automation complete.")
+        logging.error(f"Error clicking 'Submit' button or navigating: {e}")
 
 
-
-def run_ocr_and_cleanup():
-    from ocr import extract_text_from_pics_and_get_score
-    score = extract_text_from_pics_and_get_score()
-    logging.info(f"[RESULT] Final score: {score}/30")
-    try:
-        for fname in os.listdir("pics"):
-            if fname.lower().endswith(".png"):
-                os.remove(os.path.join("pics", fname))
-        print("[debug] All pics deleted since score was successfully found.")
-    except Exception as e:
-        print(f"[error] Failed to delete pics: {e}")
-
-def take_exam_screenshots(page, num_shots=20, delay=0.2):
-    os.makedirs("pics", exist_ok=True)
-    for i in range(50):
-        fname = f"pics/exam_submit_{i+1}.png"
-        page.screenshot(path=fname)
-        print(f"[debug] Screenshot saved: {fname}")
-        time.sleep(0.1)
 
 def complete_exam(page, answers):
     """Complete the exam in the browser by selecting answers and submitting, using AI selector fallback if needed."""
@@ -112,6 +121,7 @@ def complete_exam(page, answers):
 
 def navigate_to_actual_exam_page(page, selected_module_name):
     # Module-specific link clicks for modules 4, 5, 6
+    global exam_page_url  # Declare exam_page_url as global to modify the global variable
     if selected_module_name == "Module 4":
         try:
             page.get_by_role('link', name='Module 4 - 002 (ENG)').locator('a').click()
@@ -136,6 +146,7 @@ def navigate_to_actual_exam_page(page, selected_module_name):
             selector = get_selector_suggestion(page, "Module 6 - 001 (ENG) Design link")
             page.click(selector)
             logging.info(f"Clicked Module 6 specific link (AI selector: {selector}).")
+
     """Navigate to the actual exam page after module selection, using robust selectors and Ollama for fallback."""
     logging.info(f"Navigating to actual exam page for {selected_module_name}...")
     try:
@@ -190,6 +201,7 @@ def navigate_to_actual_exam_page(page, selected_module_name):
         try:
             page.get_by_role('button', name='EN', exact=True).click()
             logging.info("Clicked 'EN' button.")
+            time.sleep(3)  # Wait for language change
         except Exception:
             selector = get_selector_suggestion(page, "EN button (exact match)")
             page.click(selector)
@@ -405,3 +417,4 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
     except Exception as e:
         logging.error(f"Navigation failed: {e}")
         return False
+    
