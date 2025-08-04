@@ -16,7 +16,7 @@ def run_exam_automation() -> None:
 
     logging.info("Starting Playwright and launching Chrome browser...")
     with sync_playwright() as p:
-        browser = p.chromium.launch(channel="chrome", headless=False)
+        browser = p.chromium.launch(channel="chrome", headless=True)
         page = browser.new_page()
 
         logging.info("Navigating to exam page and logging in...")
