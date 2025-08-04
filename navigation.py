@@ -55,56 +55,52 @@ def click_next(page):
         return False
 
 def submit_exam(page):
-    """Submit the exam and restart it in a loop."""
+    """Submit the exam and extract the result."""
     logging.debug("Entering submit_exam")
-    while True:
-        logging.info("Submitting exam...")
+    logging.info("Submitting exam...")
+    try:
+        logging.debug("Attempting to click 'Submit' button by role")
+        page.get_by_role('button', name='Submit').click(timeout=1000)
+        logging.info("Clicked 'Submit' button (by role).")
+    except Exception as e:
+        logging.error(f"Failed to click 'Submit' button by role: {e}")
+
+    page.wait_for_timeout(2000)  # Increased wait for result to load
+    logging.debug("Waited 2000ms after clicking Submit")
+
+    logging.debug("Locating submit buttons with text 'Submit'")
+    submit_buttons = page.locator('button', has_text='Submit')
+    count = submit_buttons.count()
+    logging.debug(f"Found {count} submit buttons")
+
+    if count >= 2:
+        logging.debug("Attempting to click second 'Submit' button")
         try:
-            logging.debug("Attempting to click 'Submit' button by role")
-            page.get_by_role('button', name='Submit').click(timeout=1000)
-            logging.info("Clicked 'Submit' button (by role).")
+            submit_buttons.nth(1).click(timeout=1000)
+            logging.info("Clicked second 'Submit' button (confirmation).")
+            page.wait_for_timeout(2000)  # Wait for confirmation to process
         except Exception as e:
-            logging.error(f"Failed to click 'Submit' button by role: {e}")
-
-        page.wait_for_timeout(1000)
-        logging.debug("Waited 1000ms after clicking Submit")
-
-        logging.debug("Locating submit buttons with text 'Submit'")
-        submit_buttons = page.locator('button', has_text='Submit')
-        count = submit_buttons.count()
-        logging.debug(f"Found {count} submit buttons")
-
-        if count >= 2:
-            logging.debug("Attempting to click second 'Submit' button")
-            try:
-                submit_buttons.nth(1).click(timeout=1000)
-                logging.info("Clicked second 'Submit' button (confirmation).")
-            except Exception as e:
-                logging.error(f"Failed to click second 'Submit' button: {e}")
-        elif count == 1:
-            logging.debug("Attempting to click only available 'Submit' button")
-            try:
-                submit_buttons.nth(0).click(timeout=1000)
-                logging.info("Clicked only available 'Submit' button.")
-            except Exception as e:
-                logging.error(f"Failed to click only 'Submit' button: {e}")
-        else:
-            logging.warning("No 'Submit' button found.")
-            return
-
-        time.sleep(2)
-        logging.debug("Waited 2 seconds after clicking submit button")
-
+            logging.error(f"Failed to click second 'Submit' button: {e}")
+    elif count == 1:
+        logging.debug("Attempting to click only available 'Submit' button")
         try:
-            from extract_result import extract_exam_result
-            logging.debug("Extracting exam result")
-            result = extract_exam_result(page)
-            logging.info(f"Exam result extracted: {result}")
+            submit_buttons.nth(0).click(timeout=1000)
+            logging.info("Clicked only available 'Submit' button.")
+            page.wait_for_timeout(2000)
         except Exception as e:
-            logging.error(f"Failed to extract exam result: {e}")
+            logging.error(f"Failed to click only 'Submit' button: {e}")
+    else:
+        logging.warning("No additional 'Submit' button found.")
 
-        logging.debug("Calling restart_exam")
-        restart_exam(page)
+    try:
+        from extract_result import extract_exam_result
+        logging.debug("Extracting exam result")
+        result = extract_exam_result(page)
+        logging.info(f"Exam result extracted: {result}")
+        return result  # Return result_text, score_text
+    except Exception as e:
+        logging.error(f"Failed to extract exam result: {e}")
+        return None, None
 
 def restart_exam(page):
     """Restart the exam after submission."""
@@ -160,29 +156,37 @@ def restart_exam(page):
         logging.error(f"Failed to click 'EN' button: {e}")
 
 def complete_exam(page, answers):
-    """Complete the exam in the browser by selecting answers and submitting, using AI selector fallback if needed."""
+    """Complete the exam in the browser by selecting answers and submitting."""
     logging.debug(f"Entering complete_exam with {len(answers)} answers: {answers}")
     logging.info(f"Starting exam automation for {len(answers)} questions...")
     for idx, answer_index in enumerate(answers):
-        logging.debug(f"Processing question {idx+1} with answer_index: {answer_index}")
         logging.info(f"Answering question {idx+1}: Option {answer_index}")
         try:
+            page.wait_for_selector('button, input[type="radio"], input[type="checkbox"]', timeout=10000)
             click_answer_by_index(page, answer_index)
+            page.wait_for_timeout(500)  # Ensure selection registers
+            if not click_next(page):
+                logging.info("'Next >' button not found. Submitting exam...")
+                result = submit_exam(page)
+                if result[1] is None:
+                    logging.error("Failed to extract score in submit_exam.")
+                    return None, None
+                restart_exam(page)  # Restart after submission
+                return result
         except Exception as e:
             logging.error(f"Failed to answer question {idx+1}: {e}")
-            return
-        if not click_next(page):
-            logging.info("'Next >' button not found. Submitting exam immediately...")
-            try:
-                submit_exam(page)
-            except Exception as e:
-                logging.error(f"Failed to submit exam: {e}")
-            return
+            return None, None
     logging.debug("Completed all questions, proceeding to submit")
     try:
-        submit_exam(page)
+        result = submit_exam(page)
+        if result[1] is None:
+            logging.error("Failed to extract score in submit_exam.")
+            return None, None
+        restart_exam(page)  # Restart after submission
+        return result
     except Exception as e:
-        logging.error(f"Failed to submit exam after answering all questions: {e}")
+        logging.error(f"Failed to submit exam: {e}")
+        return None, None
 
 def navigate_to_actual_exam_page(page, selected_module_name):
     # Module-specific link clicks for modules 4, 5, 6

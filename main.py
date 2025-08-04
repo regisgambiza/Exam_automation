@@ -6,7 +6,7 @@ from extract_result import extract_exam_result
 from algorithm import AdaptiveGreedyExamSolver
 
 def run_exam_automation() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
     logging.info("Loading configuration...")
     try:
         config = load_config()
@@ -46,28 +46,38 @@ def run_exam_automation() -> None:
         def exam_callback(answers):
             logging.info(f"Submitting answers: {answers}")
             try:
-                complete_exam(page, answers)
-                logging.info("Extracting exam result...")
-                result_text, score_text = extract_exam_result(page)
+                result_text, score_text = complete_exam(page, answers)
+                logging.info(f"Raw result from complete_exam: ({result_text}, {score_text})")
                 if not score_text:
                     logging.error("Failed to extract score. Defaulting to 0/30.")
                     score_text = "0/30"
-                logging.info(f"Exam result: {score_text}")
-                
-                
-
-                return "Done", score_text
+                return result_text or "Done", score_text
             except Exception as e:
                 logging.error(f"Error in exam callback: {e}")
                 return "Error", "0/30"
-        page.goto(exam_page_url)
-        # Run the AI exam solver
-        logging.info("Starting AdaptiveGreedyExamSolver...")
-        solver = AdaptiveGreedyExamSolver(num_questions=30, num_options=4, max_stuck_attempts=10)
-        final_answers = solver.solve(exam_callback)
 
-        logging.info(f"Final correct answers: {final_answers}")
-        browser.close()
+        # Navigate to exam page with error handling
+        try:
+            logging.debug(f"Navigating to exam page: {exam_page_url}")
+            page.goto(exam_page_url, timeout=30000)  # Increased timeout
+            page.wait_for_load_state('load', timeout=30000)
+            logging.info("Successfully loaded exam page.")
+        except Exception as e:
+            logging.error(f"Failed to navigate to exam page {exam_page_url}: {e}")
+            browser.close()
+            return
+
+        # Run the solver with error handling
+        try:
+            logging.info("Starting AdaptiveGreedyExamSolver...")
+            solver = AdaptiveGreedyExamSolver(num_questions=30, num_options=4, max_stuck_attempts=10)
+            final_answers = solver.solve(exam_callback)
+            logging.info(f"Final correct answers: {final_answers}")
+        except Exception as e:
+            logging.error(f"Error running solver: {e}")
+        finally:
+            logging.info("Closing browser...")
+            browser.close()
 
 if __name__ == "__main__":
     run_exam_automation()

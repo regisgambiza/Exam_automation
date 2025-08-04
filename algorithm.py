@@ -96,14 +96,16 @@ class AdaptiveGreedyExamSolver:
             logging.info(f"Attempt {attempt_num}")
             answers = self.generate_guess()
             result_text, score_text = exam_callback(answers)
+            logging.debug(f"Received from exam_callback: result_text={result_text}, score_text={score_text}")
 
             if not score_text or '/' not in score_text:
-                logging.warning("Invalid score text. Skipping.")
+                logging.warning(f"Invalid score text: {score_text}. Skipping.")
                 self.export_log()
                 continue
 
             try:
                 score = int(score_text.split('/')[0])
+                logging.debug(f"Parsed score: {score}")
                 if score < 0 or score > self.num_questions:
                     logging.warning(f"Invalid score value {score}. Skipping.")
                     self.export_log()
@@ -130,7 +132,8 @@ class AdaptiveGreedyExamSolver:
                         new_guess = self.best_answers[:]
                         new_guess[i] = opt
                         self.tested_options[i].add(opt)
-                        _, score_text = exam_callback(new_guess)
+                        result_text, score_text = exam_callback(new_guess)
+                        logging.debug(f"Brute-force: result_text={result_text}, score_text={score_text}")
                         try:
                             score = int(score_text.split('/')[0])
                             if score < 0 or score > self.num_questions:
@@ -154,4 +157,3 @@ class AdaptiveGreedyExamSolver:
         self.export_log()
         logging.info(f"Final answers: {self.correct_answers}")
         return self.correct_answers
-
