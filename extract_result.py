@@ -17,13 +17,13 @@ def extract_exam_result(page: Page):
                 result_heading = page.get_by_role('heading', name=heading)
                 result_heading.wait_for(timeout=5000)
                 result_heading.click()
-                logging.info(f"Clicked on result heading: '{heading}'")
+                logging.info(f"Clicked result heading: {heading}")
                 result_text = heading
                 break
             except Exception:
                 continue
         if not result_text:
-            logging.error("Could not find examination result heading.")
+            logging.error("Failed to find result heading")
         # Now look for score text like '23/30' in the popup
         # Try to find any element containing the score pattern
         score_pattern = re.compile(r'\b(\d{1,2}/30)\b')
@@ -34,10 +34,10 @@ def extract_exam_result(page: Page):
             score_text = match.group(1)
             logging.info(f"Extracted score: {score_text}")
         else:
-            logging.warning("Could not find score in popup.")
+            logging.warning("No score found in page content")
         return result_text, score_text
     except Exception as e:
-        logging.error(f"Error extracting exam result and score: {e}")
+        logging.error(f"Failed to extract result: {e}")
         return None, None
 
 if __name__ == "__main__":

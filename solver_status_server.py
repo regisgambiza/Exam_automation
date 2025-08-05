@@ -1,7 +1,6 @@
 from flask import Flask, render_template_string, jsonify
 import json
 import os
-import time
 
 app = Flask(__name__)
 
@@ -18,13 +17,8 @@ DASHBOARD_HTML = """
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      padding: 20px;
-      background: #f8f9fa;
-    }
-    .card {
-      margin-bottom: 20px;
-    }
+    body { padding: 20px; background: #f8f9fa; }
+    .card { margin-bottom: 20px; }
     pre {
       max-height: 250px;
       overflow-y: auto;
@@ -110,7 +104,7 @@ DASHBOARD_HTML = """
     function updateDashboard(data) {
       document.getElementById("total-attempts").textContent = data.attempts;
       document.getElementById("best-score").textContent = `${data.best_score} / ${data.total_questions}`;
-      let progressPercent = (data.best_score / data.total_questions) * 100;
+      const progressPercent = (data.best_score / data.total_questions) * 100;
       const progressBar = document.getElementById("score-progress");
       progressBar.style.width = progressPercent + "%";
       progressBar.textContent = Math.round(progressPercent) + "%";
@@ -131,9 +125,8 @@ DASHBOARD_HTML = """
         tbody.appendChild(row);
       });
 
-      // Update score chart
-      const scores = data.recent_attempts.map(att => att.score);
-      const labels = data.recent_attempts.map((_, i) => `#${data.attempts - data.recent_attempts.length + i + 1}`);
+      const scores = data.all_scores;
+      const labels = scores.map((_, i) => `#${i + 1}`);
 
       if (!scoreChart) {
         const ctx = document.getElementById("scoreChart").getContext("2d");
@@ -173,11 +166,7 @@ DASHBOARD_HTML = """
 
     function updateLogs(logData) {
       const logElement = document.getElementById("log-content");
-      if (logData.logs && logData.logs.length > 0) {
-        logElement.textContent = logData.logs.join("");
-      } else {
-        logElement.textContent = "No logs available.";
-      }
+      logElement.textContent = logData.logs?.length ? logData.logs.join("") : "No logs available.";
     }
 
     async function fetchData() {
@@ -206,7 +195,7 @@ def load_state():
     if not os.path.exists(STATE_FILE):
         return {}
     try:
-        with open(STATE_FILE, "r") as f:
+        with open(STATE_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except:
         return {}
@@ -228,18 +217,15 @@ def index():
 @app.route("/api/state")
 def api_state():
     state = load_state()
-
-    # Provide fallback values if keys missing
-    attempts = len(state.get("attempts", []))
-    best_score = state.get("last_score", 0)
+    attempts_list = state.get("attempts", [])
+    attempts = len(attempts_list)
+    best_score = max((att.get("score", 0) for att in attempts_list), default=0)
     total_questions = state.get("num_questions", 30)
-    correct_answers = state.get("correct_answers", [None]*total_questions)
+    correct_answers = state.get("correct_answers", [None] * total_questions)
     confirmed = sum(1 for ans in correct_answers if ans is not None)
     guessed = sum(1 for ans in correct_answers if ans is None)
-    unique_guesses = len(state.get("guess_history", []))
 
-    recent_attempts = state.get("attempts", [])[-10:]
-    # Simplify attempts for UI
+    recent_attempts = attempts_list[-10:]
     recent_attempts = [
         {
             "score": att.get("score", 0),
@@ -249,14 +235,16 @@ def api_state():
         for att in recent_attempts
     ]
 
+    all_scores = [att.get("score", 0) for att in attempts_list]
+
     return jsonify({
         "attempts": attempts,
         "best_score": best_score,
         "total_questions": total_questions,
         "confirmed": confirmed,
         "guessed": guessed,
-        "unique_guesses": unique_guesses,
-        "recent_attempts": recent_attempts
+        "recent_attempts": recent_attempts,
+        "all_scores": all_scores
     })
 
 @app.route("/api/logs")
