@@ -5,18 +5,16 @@ import time
 from datetime import datetime
 from typing import List, Dict, Set, Tuple, Optional
 import math
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
 import os
 
 class AdaptiveGreedyExamSolver:
-    def __init__(self, num_questions: int = 30, num_options: int = 4, max_stuck_attempts: int = 5, exploration_rate: float = 0.1, max_changes_per_guess: int = 3, max_parallel_guesses: int = 3, confidence_threshold: float = 0.9, log_mode: str = "overwrite"):
+    def __init__(self, num_questions: int = 30, num_options: int = 4, max_stuck_attempts: int = 10, exploration_rate: float = 0.1, max_changes_per_guess: int = 3, confidence_threshold: float = 0.9, log_mode: str = "overwrite"):
         self.num_questions = num_questions
         self.num_options = num_options
         self.max_stuck_attempts = max_stuck_attempts
         self.exploration_rate = exploration_rate
         self.max_changes_per_guess = max_changes_per_guess
-        self.max_parallel_guesses = max_parallel_guesses
         self.confidence_threshold = confidence_threshold
         self.best_score = 0
         self.best_answers = [1] * num_questions
@@ -29,26 +27,24 @@ class AdaptiveGreedyExamSolver:
         self.guess_history: Set[str] = set()
         self.test_mode = False
         self.clusters: List[List[int]] = []
-        self.log_mode = log_mode  # "overwrite" or "append"
+        self.log_mode = log_mode
         self.state_file = "solver_state.json"
-        self.load_state()  # Load state if it exists
-        logging.debug(f"Initialized solver: {num_questions} questions, {num_options} options, max_stuck_attempts={max_stuck_attempts}, exploration_rate={exploration_rate}, max_changes_per_guess={max_changes_per_guess}, max_parallel_guesses={max_parallel_guesses}, confidence_threshold={confidence_threshold}, log_mode={log_mode}")
+        self.load_state()
+        logging.debug(f"Initialized solver: {num_questions} questions, {num_options} options, max_stuck_attempts={max_stuck_attempts}, exploration_rate={exploration_rate}, max_changes_per_guess={max_changes_per_guess}, confidence_threshold={confidence_threshold}, log_mode={log_mode}")
 
     def set_test_mode(self, correct_answers: List[int]) -> None:
-        """Enable test mode with known correct answers for simulation."""
         self.test_mode = True
         self.test_correct_answers = correct_answers
         logging.info(f"Test mode enabled with correct answers: {correct_answers}")
 
     def load_state(self) -> None:
-        """Load solver state from solver_state.json if it exists."""
         if os.path.exists(self.state_file):
             try:
                 with open(self.state_file, "r") as f:
                     state = json.load(f)
                 self.correct_answers = state.get("correct_answers", [None] * self.num_questions)
                 self.tested_options = {int(k): set(v) for k, v in state.get("tested_options", {}).items()}
-                self.attempts = state.get("attempts", [])[-10:]  # Keep only last 10 attempts
+                self.attempts = state.get("attempts", [])[-10:]
                 self.best_score = state.get("last_score", 0)
                 self.best_answers = state.get("best_answers", [1] * self.num_questions)
                 self.guess_history = set(state.get("guess_history", []))
@@ -62,7 +58,6 @@ class AdaptiveGreedyExamSolver:
             self._initialize_default_state()
 
     def _initialize_default_state(self) -> None:
-        """Initialize default state if no state file exists or loading fails."""
         self.correct_answers = [None] * self.num_questions
         self.tested_options = {i: set() for i in range(self.num_questions)}
         self.option_scores = {i: {opt: 1.0 for opt in range(1, self.num_options + 1)} for i in range(self.num_questions)}
@@ -74,14 +69,13 @@ class AdaptiveGreedyExamSolver:
         logging.debug("Initialized default solver state.")
 
     def save_state(self) -> None:
-        """Save solver state to solver_state.json."""
         state = {
             "correct_answers": self.correct_answers,
             "tested_options": {str(i): list(self.tested_options[i]) for i in range(self.num_questions)},
-            "attempts": self.attempts[-10:],  # Save only last 10 attempts
+            "attempts": self.attempts[-10:],
             "last_score": self.best_score,
             "best_answers": self.best_answers,
-            "guess_history": list(self.guess_history)[-100:],  # Limit to last 100 guesses
+            "guess_history": list(self.guess_history)[-100:],
             "option_scores": {str(i): self.option_scores[i] for i in range(self.num_questions)},
             "stuck_counter": self.stuck_counter,
             "question_entropy": {str(i): self._compute_confidence(i)[1] for i in range(self.num_questions)}
@@ -94,7 +88,6 @@ class AdaptiveGreedyExamSolver:
             logging.error(f"Failed to save state to {self.state_file}: {e}")
 
     def _compute_confidence(self, question: int) -> Tuple[float, float]:
-        """Calculate confidence and uncertainty for a question based on option scores."""
         scores = [self.option_scores[question][opt] for opt in range(1, self.num_options + 1)]
         total = sum(scores)
         if total == 0:
@@ -106,20 +99,18 @@ class AdaptiveGreedyExamSolver:
         return max_prob, uncertainty
 
     def _cluster_questions(self) -> None:
-        """Group questions into clusters based on uncertainty for smart brute-forcing."""
         uncertainties = [(i, self._compute_confidence(i)[1]) for i in range(self.num_questions) if self.correct_answers[i] is None]
         if not uncertainties:
             self.clusters = []
             return
         uncertainties.sort(key=lambda x: x[1], reverse=True)
         num_clusters = min(3, len(uncertainties))
-        self.clusters = [[] for _ in range(num_clusters)] if num_clusters > 0 else []
-        for i, _ in uncertainties:
-            self.clusters[i % num_clusters].append(i)
+        cluster_size = max(1, len(uncertainties) // num_clusters)
+        self.clusters = [uncertainties[i:i + cluster_size] for i in range(0, len(uncertainties), cluster_size)]
+        self.clusters = [[i for i, _ in cluster] for cluster in self.clusters]
         logging.debug(f"Clustered questions: {self.clusters}")
 
     def generate_guess(self) -> List[int]:
-        """Generate a new guess, changing up to max_changes_per_guess answers."""
         logging.debug("Generating guess...")
         guess = self.best_answers.copy()
         unknown_indices = [i for i in range(self.num_questions) if self.correct_answers[i] is None]
@@ -154,6 +145,9 @@ class AdaptiveGreedyExamSolver:
         guess_str = str(guess)
         if guess_str in self.guess_history:
             logging.debug("Guess already tried. Generating new guess.")
+            if len(self.guess_history) > 1000:  # Prevent infinite recursion
+                logging.warning("Guess history too large. Clearing to avoid infinite loop.")
+                self.guess_history.clear()
             return self.generate_guess()
         self.guess_history.add(guess_str)
         self.last_changed_indices = change_indices
@@ -161,7 +155,6 @@ class AdaptiveGreedyExamSolver:
         return guess
 
     def _evaluate_guess(self, guess: List[int]) -> Tuple[str, Optional[str]]:
-        """Evaluate a single guess, handling retries for flaky exam_callback."""
         for retry in range(3):
             try:
                 if self.test_mode:
@@ -182,7 +175,6 @@ class AdaptiveGreedyExamSolver:
         return "Error", None
 
     def update_with_score(self, answers: List[int], score: int, changed_indices: List[int]) -> None:
-        """Update solver state with the score from the latest attempt."""
         self.attempts.append({"answers": answers.copy(), "score": score, "changed_indices": changed_indices})
         if score > self.best_score:
             logging.info(f"New best score: {score}/{self.num_questions}, updating best_answers: {answers}, changed: {changed_indices}")
@@ -201,7 +193,6 @@ class AdaptiveGreedyExamSolver:
         self.save_state()
 
     def mark_correct(self, score: int, answers: List[int], changed_indices: List[int]) -> None:
-        """Mark answers as correct if the score improves."""
         if len(self.attempts) < 2:
             logging.debug("Not enough attempts to mark correct answers.")
             return
@@ -237,7 +228,6 @@ class AdaptiveGreedyExamSolver:
         self.save_state()
 
     def _should_stop_early(self) -> bool:
-        """Check if solver should stop early based on confidence and progress."""
         confirmed = sum(1 for ans in self.correct_answers if ans is not None)
         confidences = [self._compute_confidence(i)[0] for i in range(self.num_questions) if self.correct_answers[i] is None]
         high_confidence = all(c >= self.confidence_threshold for c in confidences) if confidences else True
@@ -246,7 +236,6 @@ class AdaptiveGreedyExamSolver:
         return confirmed >= self.num_questions * 0.9 or (high_confidence and stalled)
 
     def fill_remaining_with_best(self) -> None:
-        """Fill remaining unknown answers with the highest-scoring options."""
         for i in range(self.num_questions):
             if self.correct_answers[i] is None:
                 best_option = max(range(1, self.num_options + 1), key=lambda opt: self.option_scores[i][opt])
@@ -255,7 +244,6 @@ class AdaptiveGreedyExamSolver:
         self.save_state()
 
     def export_log(self) -> None:
-        """Export solver log to a single solver.log file, overwriting or appending based on log_mode."""
         confirmed = [i + 1 for i, ans in enumerate(self.correct_answers) if ans is not None]
         guessed = [i + 1 for i, ans in enumerate(self.correct_answers) if ans is None]
         last_attempt = self.attempts[-1] if self.attempts else {"score": 0, "changed_indices": []}
@@ -282,7 +270,6 @@ class AdaptiveGreedyExamSolver:
             logging.error(f"Failed to write to solver.log: {e}")
 
     def solve(self, exam_callback) -> List[int]:
-        """Run the solver with parallel guessing and simulated annealing."""
         self.exam_callback = exam_callback
         attempt_num = len(self.attempts) + 1
         temperature = 1.0
@@ -297,28 +284,25 @@ class AdaptiveGreedyExamSolver:
                 break
             logging.info(f"Attempt {attempt_num}, temperature={temperature:.3f}")
             
-            guesses = [self.generate_guess() for _ in range(min(self.max_parallel_guesses, len([i for i in range(self.num_questions) if self.correct_answers[i] is None])))]
+            guesses = [self.generate_guess() for _ in range(min(3, len([i for i in range(self.num_questions) if self.correct_answers[i] is None])))]
             guesses = [g for g in guesses if str(g) not in self.guess_history]
             if not guesses:
                 logging.debug("No new unique guesses generated. Forcing new guess.")
                 guesses = [self.generate_guess()]
 
-            with ThreadPoolExecutor(max_workers=self.max_parallel_guesses) as executor:
-                future_to_guess = {executor.submit(self._evaluate_guess, guess): guess for guess in guesses}
-                for future in as_completed(future_to_guess):
-                    guess = future_to_guess[future]
-                    try:
-                        result_text, score_text = future.result()
-                        if score_text is None:
-                            logging.warning(f"Invalid score for guess {guess}. Skipping.")
-                            continue
-                        score = int(score_text.split('/')[0])
-                        logging.debug(f"Evaluated guess {guess}: score={score}/{self.num_questions}")
-                        changed_indices = [i for i, (a, b) in enumerate(zip(guess, self.best_answers)) if a != b]
-                        self.update_with_score(guess, score, changed_indices)
-                        self.mark_correct(score, guess, changed_indices)
-                    except Exception as e:
-                        logging.warning(f"Error evaluating guess {guess}: {e}")
+            for guess in guesses:
+                try:
+                    result_text, score_text = self._evaluate_guess(guess)
+                    if score_text is None:
+                        logging.warning(f"Invalid score for guess {guess}. Skipping.")
+                        continue
+                    score = int(score_text.split('/')[0])
+                    logging.debug(f"Evaluated guess {guess}: score={score}/{self.num_questions}")
+                    changed_indices = [i for i, (a, b) in enumerate(zip(guess, self.best_answers)) if a != b]
+                    self.update_with_score(guess, score, changed_indices)
+                    self.mark_correct(score, guess, changed_indices)
+                except Exception as e:
+                    logging.warning(f"Error evaluating guess {guess}: {e}")
 
             self._cluster_questions()
             self.export_log()
@@ -333,9 +317,9 @@ class AdaptiveGreedyExamSolver:
                     if not cluster:
                         continue
                     logging.info(f"Brute-forcing cluster: {cluster}")
-                    for opt_combination in np.ndindex(*[self.num_options] * len(cluster)):
+                    for opt_combination in np.ndindex(*[self.num_options] * min(3, len(cluster))):  # Limit cluster size
                         new_guess = self.best_answers.copy()
-                        for idx, opt in zip(cluster, opt_combination):
+                        for idx, opt in zip(cluster[:3], opt_combination):
                             option = opt + 1
                             if option in self.tested_options[idx]:
                                 continue
@@ -350,9 +334,9 @@ class AdaptiveGreedyExamSolver:
                         if score_text:
                             score = int(score_text.split('/')[0])
                             logging.debug(f"Cluster brute-force result: score={score}/{self.num_questions}")
-                            self.update_with_score(new_guess, score, cluster)
+                            self.update_with_score(new_guess, score, cluster[:3])
                             if score > self.best_score:
-                                for idx, opt in zip(cluster, opt_combination):
+                                for idx, opt in zip(cluster[:3], opt_combination):
                                     if self.correct_answers[idx] is None:
                                         self.correct_answers[idx] = opt + 1
                                         logging.info(f"Q{idx + 1}: Confirmed {opt + 1} as correct via cluster brute-force")
