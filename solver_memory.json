@@ -1,0 +1,369 @@
+{
+  "best_score": 17,
+  "best_answers": [
+    3,
+    4,
+    3,
+    3,
+    2,
+    3,
+    3,
+    1,
+    4,
+    4,
+    1,
+    4,
+    4,
+    4,
+    4,
+    2,
+    1,
+    2,
+    4,
+    3,
+    3,
+    2,
+    4,
+    3,
+    4,
+    4,
+    4,
+    2,
+    1,
+    4
+  ],
+  "correct_answers": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "memory": {
+    "0": {
+      "options": {
+        "2": 5,
+        "1": 13,
+        "3": 0,
+        "4": 8
+      },
+      "best_option": 4,
+      "best_score": 14
+    },
+    "1": {
+      "options": {
+        "1": 14,
+        "2": 14,
+        "3": 15,
+        "4": 7
+      },
+      "best_option": 3,
+      "best_score": 15
+    },
+    "2": {
+      "options": {
+        "1": 6,
+        "2": 7,
+        "3": 8,
+        "4": 15
+      },
+      "best_option": 3,
+      "best_score": 16
+    },
+    "3": {
+      "options": {
+        "1": 15,
+        "2": 16,
+        "3": 12,
+        "4": 15
+      },
+      "best_option": 2,
+      "best_score": 16
+    },
+    "4": {
+      "options": {
+        "1": 9,
+        "2": 7,
+        "3": 17,
+        "4": 16
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "5": {
+      "options": {
+        "1": 0,
+        "2": 6,
+        "3": 6,
+        "4": 8
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "6": {
+      "options": {
+        "1": 8,
+        "2": 17,
+        "3": 10,
+        "4": 9
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "7": {
+      "options": {
+        "1": 6,
+        "2": 7,
+        "3": 10,
+        "4": 8
+      },
+      "best_option": 2,
+      "best_score": 17
+    },
+    "8": {
+      "options": {
+        "1": 9,
+        "2": 13,
+        "3": 8,
+        "4": 10
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "9": {
+      "options": {
+        "1": 16,
+        "2": 16,
+        "3": 8,
+        "4": 7
+      },
+      "best_option": 4,
+      "best_score": 17
+    },
+    "10": {
+      "options": {
+        "1": 9,
+        "2": 8,
+        "3": 10,
+        "4": 7
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "11": {
+      "options": {
+        "1": 5,
+        "2": 17,
+        "3": 7,
+        "4": 6
+      },
+      "best_option": 2,
+      "best_score": 17
+    },
+    "12": {
+      "options": {
+        "1": 8,
+        "2": 11,
+        "3": 17,
+        "4": 9
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "13": {
+      "options": {
+        "1": 8,
+        "2": 17,
+        "3": 9,
+        "4": 8
+      },
+      "best_option": 2,
+      "best_score": 17
+    },
+    "14": {
+      "options": {
+        "1": 9,
+        "2": 8,
+        "3": 0,
+        "4": 8
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "15": {
+      "options": {
+        "1": 9,
+        "2": 7,
+        "3": 8,
+        "4": 17
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "16": {
+      "options": {
+        "1": 7,
+        "2": 7,
+        "3": 0,
+        "4": 0
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "17": {
+      "options": {
+        "1": 7,
+        "2": 9,
+        "3": 9,
+        "4": 7
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "18": {
+      "options": {
+        "1": 16,
+        "2": 8,
+        "3": 7,
+        "4": 8
+      },
+      "best_option": 4,
+      "best_score": 17
+    },
+    "19": {
+      "options": {
+        "1": 17,
+        "2": 17,
+        "3": 8,
+        "4": 0
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "20": {
+      "options": {
+        "1": 8,
+        "2": 8,
+        "3": 11,
+        "4": 17
+      },
+      "best_option": 4,
+      "best_score": 17
+    },
+    "21": {
+      "options": {
+        "1": 17,
+        "2": 8,
+        "3": 8,
+        "4": 0
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "22": {
+      "options": {
+        "1": 9,
+        "2": 16,
+        "3": 13,
+        "4": 7
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "23": {
+      "options": {
+        "1": 16,
+        "2": 17,
+        "3": 8,
+        "4": 10
+      },
+      "best_option": 2,
+      "best_score": 17
+    },
+    "24": {
+      "options": {
+        "1": 12,
+        "2": 0,
+        "3": 9,
+        "4": 6
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "25": {
+      "options": {
+        "1": 17,
+        "2": 16,
+        "3": 9,
+        "4": 7
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "26": {
+      "options": {
+        "1": 17,
+        "2": 17,
+        "3": 10,
+        "4": 9
+      },
+      "best_option": 1,
+      "best_score": 17
+    },
+    "27": {
+      "options": {
+        "1": 0,
+        "2": 17,
+        "3": 16,
+        "4": 16
+      },
+      "best_option": 2,
+      "best_score": 17
+    },
+    "28": {
+      "options": {
+        "1": 6,
+        "2": 0,
+        "3": 7,
+        "4": 15
+      },
+      "best_option": 3,
+      "best_score": 17
+    },
+    "29": {
+      "options": {
+        "1": 8,
+        "2": 8,
+        "3": 17,
+        "4": 16
+      },
+      "best_option": 3,
+      "best_score": 17
+    }
+  }
+}

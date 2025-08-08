@@ -1,10 +1,10 @@
-import logging
 import os
 from playwright.sync_api import Page
 from tenacity import retry, stop_after_attempt, wait_fixed
 import ollama
 import time
-import re  # Already present in your code, retained for consistency
+import re
+import logging  # Logging module imported
 
 # Configure logging to capture detailed debug information
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -13,30 +13,19 @@ exam_page_url = None
 selected_module_name = None  # Global declaration
 
 def click_answer_by_index(page, answer_index):
-    """Click the answer by index, with AI fallback."""
+    """Click the answer by index, restart exam if click fails."""
     logging.debug(f"Selecting answer option {answer_index}")
     try:
-        # Target the button within div.col-12, indexed from 0 (e.g., answer_index - 1)
         locator = page.locator("div.col-12 button").nth(answer_index - 1)
         if wait_and_click(locator, f"answer option {answer_index}"):
             logging.info(f"Clicked answer option {answer_index}")
             return True
-        # AI fallback if direct match fails
-        logging.debug(f"Trying AI fallback for option {answer_index}")
-        selector = get_selector_suggestion(page, f"button for answer option {answer_index}")
-        logging.debug(f"AI selector: {selector}")
-        if selector:
-            try:
-                page.click(selector, timeout=5000)
-                logging.info(f"Clicked answer option {answer_index} with AI selector: {selector}")
-                return True
-            except TimeoutError:
-                logging.error(f"AI selector timeout for option {answer_index}: {selector}")
-        logging.warning(f"No answer option {answer_index} found")
-        return False  # Allow recovery in complete_exam
+        else:
+            raise Exception(f"Failed to click answer option {answer_index}")
     except Exception as e:
         logging.error(f"Failed to select answer option {answer_index}: {e}")
-        return False
+        restart_exam(page)  # Restart the exam on failure
+        raise  # Re-raise to trigger retry in complete_exam
 
 def wait_and_click(locator, description, max_retries=3, timeout=10000):
     """Helper function to wait for and click an element with retries."""
@@ -57,7 +46,7 @@ def wait_and_click(locator, description, max_retries=3, timeout=10000):
     return False
 
 def click_next(page):
-    """Click the 'Next >' button, with AI fallback."""
+    """Click the 'Next >' button."""
     logging.debug("Attempting to click 'Next >' button")
     try:
         page.get_by_role('button', name='Next >').click(timeout=500)
@@ -112,15 +101,17 @@ def submit_exam(page):
         return result
     except Exception as e:
         logging.error(f"Failed to extract result: {e}")
+        try:
+            restart_exam(page, retry_count=0, max_retries=3)
+        except Exception as restart_error:
+            logging.error(f"Failed to restart exam: {restart_error}")
         return None, None
 
-# [Rest of the functions (restart_exam, complete_exam, navigate_to_actual_exam_page, select_module, get_selector_suggestion, navigate_to_exam) remain unchanged as per your provided code]
-
-def restart_exam(page):
+def restart_exam(page, retry_count=0, max_retries=3):
     """Restart the exam after submission."""
     global selected_module_name
     exam_button_name = f"Final Exam {selected_module_name} batch"
-    logging.debug(f"Restarting exam: {exam_button_name}")
+    logging.debug(f"Restarting exam: {exam_button_name} (Retry {retry_count + 1}/{max_retries})")
 
     logging.info("Restarting exam")
     try:
@@ -135,34 +126,64 @@ def restart_exam(page):
     except Exception as e:
         logging.error(f"Failed to click '{exam_button_name}': {e}")
 
-    # Fixed section: Handle paragraph click with robust selector and AI fallback
     try:
         option = page.get_by_role('option', name=exam_button_name)
         option.get_by_role('paragraph').click()
         logging.info(f"Clicked paragraph in '{exam_button_name}'")
     except Exception as e:
         logging.error(f"Failed to click paragraph in '{exam_button_name}': {e}")
-        selector = get_selector_suggestion(page, f"paragraph in option for {exam_button_name}")
-        logging.debug(f"AI selector for paragraph: {selector}")
+
+    # Modified section: Wait 30 seconds for page to load, then try clicking 'EXAM AGAIN' or 'START EXAM'
+    max_attempts = 30  # Maximum number of retry attempts for button
+    attempt = 1
+    logging.info("Waiting 60 seconds for page to load before attempting to click exam button")
+    time.sleep(60)  # 30-second wait for site to load
+    while attempt <= max_attempts:
         try:
-            page.click(selector)
-            logging.info(f"Clicked paragraph with AI selector: {selector}")
+            logging.debug(f"Attempt {attempt} to click 'EXAM AGAIN' or 'START EXAM' button")
+            # Try both possible button texts
+            button_locator = page.locator('button:has-text("EXAM AGAIN"), button:has-text("START EXAM")')
+            button_locator.wait_for(state="visible", timeout=15000)  # 15-second wait per attempt
+            button_locator.scroll_into_view_if_needed()
+            button_locator.click(timeout=1000)
+            logging.info("Clicked 'EXAM AGAIN' or 'START EXAM'")
+            break  # Exit loop on success
         except Exception as e:
-            logging.error(f"AI selector failed for paragraph: {e}")
+            logging.warning(f"Attempt {attempt} failed to click 'EXAM AGAIN' or 'START EXAM': {e}")
+            if attempt == max_attempts:
+                logging.error(f"Failed to click exam button after {max_attempts} attempts")
+                if retry_count < max_retries - 1:
+                    logging.info(f"Retrying entire restart process (Retry {retry_count + 2}/{max_retries})")
+                    time.sleep(5)  # Brief pause before retrying
+                    restart_exam(page, retry_count=retry_count + 1, max_retries=max_retries)
+                    return  # Exit after recursive call
+                else:
+                    logging.error(f"Max retries ({max_retries}) reached for restarting exam")
+                    raise Exception(f"Failed to restart exam after {max_retries} attempts")
+            time.sleep(3)  # 3-second delay between retries
+            attempt += 1
 
-    try:
-        page.get_by_role('button', name='Exam Again').click()
-        logging.info("Clicked 'Exam Again'")
-    except Exception as e:
-        logging.error(f"Failed to click 'Exam Again': {e}")
-
-    try:
-        page.get_by_text("EN", exact=True).click()
-        logging.info("Clicked 'EN' button")
-        time.sleep(3)
-        logging.debug("Waited 3s after 'EN' click")
-    except Exception as e:
-        logging.error(f"Failed to click 'EN': {e}")
+    # Retry clicking 'EN' with longer timeout
+    max_attempts = 5  # Fewer attempts for 'EN'
+    attempt = 1
+    while attempt <= max_attempts:
+        try:
+            logging.debug(f"Attempt {attempt} to click 'EN' button")
+            button_locator = page.locator('text="EN"')
+            button_locator.wait_for(state="visible", timeout=15000)  # 15-second wait per attempt
+            button_locator.scroll_into_view_if_needed()
+            button_locator.click(timeout=1000)
+            logging.info("Clicked 'EN' button")
+            time.sleep(3)  # Retain 3-second pause
+            logging.debug("Waited 3s after 'EN' click")
+            break  # Exit loop on success
+        except Exception as e:
+            logging.warning(f"Attempt {attempt} failed to click 'EN': {e}")
+            if attempt == max_attempts:
+                logging.error(f"Failed to click 'EN' after {max_attempts} attempts")
+                raise Exception(f"Failed to click 'EN' after {max_attempts} attempts")
+            time.sleep(3)  # 3-second delay between retries
+            attempt += 1
 
 def complete_exam(page, answers):
     """Complete the exam in the browser by selecting answers and submitting."""
@@ -197,49 +218,28 @@ def complete_exam(page, answers):
         logging.error(f"Failed to submit exam: {e}")
         return None, None
 
-def navigate_to_actual_exam_page(page, selected_module_name):
+def navigate_to_actual_exam_page(page, selected_module_name, retry_count=0, max_retries=3):
     # Module-specific link clicks for modules 4, 5, 6
     global exam_page_url
-    logging.debug(f"Navigating to exam page for {selected_module_name}")
+    logging.debug(f"Navigating to exam page for {selected_module_name} (Retry {retry_count + 1}/{max_retries})")
     if selected_module_name == "Module 4":
         try:
             page.get_by_role('link', name='Module 4 - 002 (ENG)').locator('a').click()
             logging.info("Clicked Module 4 link")
         except Exception as e:
             logging.error(f"Failed to click Module 4 link: {e}")
-            selector = get_selector_suggestion(page, "Module 4 - 002 (ENG) link")
-            logging.debug(f"AI selector for Module 4: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked Module 4 with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for Module 4: {e}")
     elif selected_module_name == "Module 5":
         try:
             page.get_by_role('link', name='Module 5 - 001 (ENG) Use of').locator('a').click()
             logging.info("Clicked Module 5 link")
         except Exception as e:
             logging.error(f"Failed to click Module 5 link: {e}")
-            selector = get_selector_suggestion(page, "Module 5 - 001 (ENG) Use of link")
-            logging.debug(f"AI selector for Module 5: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked Module 5 with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for Module 5: {e}")
     elif selected_module_name == "Module 6":
         try:
             page.get_by_role('link', name='Module 6 - 001 (ENG) Design').locator('a').click()
             logging.info("Clicked Module 6 link")
         except Exception as e:
             logging.error(f"Failed to click Module 6 link: {e}")
-            selector = get_selector_suggestion(page, "Module 6 - 001 (ENG) Design link")
-            logging.debug(f"AI selector for Module 6: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked Module 6 with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for Module 6: {e}")
 
     logging.info(f"Accessing exam for {selected_module_name}")
     try:
@@ -248,26 +248,12 @@ def navigate_to_actual_exam_page(page, selected_module_name):
             logging.info("Clicked 'Start Classes'")
         except Exception as e:
             logging.error(f"Failed to click 'Start Classes': {e}")
-            selector = get_selector_suggestion(page, "Start Classes button")
-            logging.debug(f"AI selector for Start Classes: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked 'Start Classes' with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for Start Classes: {e}")
 
         try:
             page.get_by_text('View Lesson').click()
             logging.info("Clicked 'View Lesson'")
         except Exception as e:
             logging.error(f"Failed to click 'View Lesson': {e}")
-            selector = get_selector_suggestion(page, "View Lesson link/button")
-            logging.debug(f"AI selector for View Lesson: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked 'View Lesson' with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for View Lesson: {e}")
 
         exam_button_name = f"Final Exam {selected_module_name} batch"
         try:
@@ -275,13 +261,6 @@ def navigate_to_actual_exam_page(page, selected_module_name):
             logging.info(f"Clicked '{exam_button_name}'")
         except Exception as e:
             logging.error(f"Failed to click '{exam_button_name}': {e}")
-            selector = get_selector_suggestion(page, f"{exam_button_name} button")
-            logging.debug(f"AI selector for {exam_button_name}: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked '{exam_button_name}' with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for {exam_button_name}: {e}")
 
         try:
             option = page.get_by_role('option', name=exam_button_name)
@@ -289,41 +268,43 @@ def navigate_to_actual_exam_page(page, selected_module_name):
             logging.info(f"Clicked paragraph in '{exam_button_name}'")
         except Exception as e:
             logging.error(f"Failed to click paragraph in '{exam_button_name}': {e}")
-            selector = get_selector_suggestion(page, f"paragraph in option for {exam_button_name}")
-            logging.debug(f"AI selector for paragraph: {selector}")
+
+        # Modified section: Wait 30 seconds for page to load, then try clicking 'EXAM AGAIN' or 'START EXAM'
+        max_attempts = 30  # Maximum number of retry attempts for button
+        attempt = 1
+        logging.info("Waiting 60 seconds for page to load before attempting to click exam button")
+        time.sleep(60)  # 30-second wait for site to load
+        while attempt <= max_attempts:
             try:
-                page.click(selector)
-                logging.info(f"Clicked paragraph with AI selector: {selector}")
+                logging.debug(f"Attempt {attempt} to click 'EXAM AGAIN' or 'START EXAM' button")
+                button_locator = page.locator('button:has-text("EXAM AGAIN"), button:has-text("START EXAM")')
+                button_locator.wait_for(state="visible", timeout=15000)  # 15-second wait
+                button_locator.scroll_into_view_if_needed()
+                button_locator.click(timeout=1000)
+                logging.info("Clicked 'EXAM AGAIN' or 'START EXAM'")
+                break  # Exit loop on success
             except Exception as e:
-                logging.error(f"AI selector failed for paragraph: {e}")
+                logging.warning(f"Attempt {attempt} failed to click 'EXAM AGAIN' or 'START EXAM': {e}")
+                if attempt == max_attempts:
+                    logging.error(f"Failed to click exam button after {max_attempts} attempts")
+                    if retry_count < max_retries - 1:
+                        logging.info(f"Retrying entire navigation process (Retry {retry_count + 2}/{max_retries})")
+                        time.sleep(5)  # Brief pause before retrying
+                        navigate_to_actual_exam_page(page, selected_module_name, retry_count=retry_count + 1, max_retries=max_retries)
+                        return  # Exit after recursive call
+                    else:
+                        logging.error(f"Max retries ({max_retries}) reached for navigating to exam page")
+                        raise Exception(f"Failed to navigate to exam page after {max_retries} attempts")
+                time.sleep(3)  # Shorter delay between retries
+                attempt += 1
 
         try:
-            page.get_by_role('button', name='Exam Again').click()
-            logging.info("Clicked 'Exam Again'")
-        except Exception as e:
-            logging.error(f"Failed to click 'Exam Again': {e}")
-            selector = get_selector_suggestion(page, "Exam Again button")
-            logging.debug(f"AI selector for Exam Again: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked 'Exam Again' with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for Exam Again: {e}")
-
-        try:
-            page.get_by_role('button', name='EN', exact=True).click()
+            page.get_by_text("EN", exact=True).click()
             logging.info("Clicked 'EN' button")
             time.sleep(3)
             logging.debug("Waited 3s after 'EN' click")
         except Exception as e:
             logging.error(f"Failed to click 'EN': {e}")
-            selector = get_selector_suggestion(page, "EN button (exact match)")
-            logging.debug(f"AI selector for EN button: {selector}")
-            try:
-                page.click(selector)
-                logging.info(f"Clicked 'EN' with AI selector: {selector}")
-            except Exception as e:
-                logging.error(f"AI selector failed for EN: {e}")
 
         logging.debug("Waiting for exam page load")
         page.wait_for_load_state('load')
@@ -374,7 +355,7 @@ def get_selector_suggestion(page, target_description):
     prompt = (
         f"Given this HTML:\n{dom_html}\n"
         f"Suggest a Playwright selector for: {target_description}. "
-        "Return only the selector string."
+        "Return only the selector string"
     )
     logging.debug(f"Sending prompt to Ollama (size: {len(prompt)} chars)")
     try:
@@ -414,16 +395,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Closed initial popup (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback close button: {e}")
-                logging.warning("Trying AI for close button")
-                try:
-                    selector = get_selector_suggestion(page, "close button")
-                    logging.debug(f"AI selector for close: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.click(selector)
-                    logging.info(f"Closed popup with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI close button failed: {e}")
-                    logging.warning("No close button found")
+                logging.warning("No close button found")
 
         logging.info("Clicking Login link")
         try:
@@ -438,16 +410,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Clicked Login link (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback Login link: {e}")
-                logging.warning("Trying AI for Login link")
-                try:
-                    selector = get_selector_suggestion(page, "login link")
-                    logging.debug(f"AI selector for login: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.click(selector)
-                    logging.info(f"Clicked Login link with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI login link failed: {e}")
-                    logging.warning("No login link found")
+                logging.warning("No login link found")
 
         logging.info("Entering ID card number")
         try:
@@ -462,16 +425,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Entered ID card number (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback ID card input: {e}")
-                logging.warning("Trying AI for ID card input")
-                try:
-                    selector = get_selector_suggestion(page, "ID card number textbox")
-                    logging.debug(f"AI selector for ID card: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.fill(selector, config["EXAM_USERNAME"])
-                    logging.info(f"Entered ID card with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI ID card input failed: {e}")
-                    logging.warning("No ID card input found")
+                logging.warning("No ID card input found")
 
         logging.info("Entering password")
         try:
@@ -486,16 +440,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Entered password (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback password input: {e}")
-                logging.warning("Trying AI for password input")
-                try:
-                    selector = get_selector_suggestion(page, "password textbox")
-                    logging.debug(f"AI selector for password: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.fill(selector, config["EXAM_PASSWORD"])
-                    logging.info(f"Entered password with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI password input failed: {e}")
-                    logging.warning("No password input found")
+                logging.warning("No password input found")
 
         logging.info("Clicking login button")
         try:
@@ -510,16 +455,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Clicked login button (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback login button: {e}")
-                logging.warning("Trying AI for login button")
-                try:
-                    selector = get_selector_suggestion(page, "login button")
-                    logging.debug(f"AI selector for login button: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.click(selector)
-                    logging.info(f"Clicked login button with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI login button failed: {e}")
-                    logging.warning("No login button found")
+                logging.warning("No login button found")
 
         logging.info("Checking for post-login close button")
         try:
@@ -534,16 +470,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Closed post-login popup (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback post-login close: {e}")
-                logging.warning("Trying AI for post-login close")
-                try:
-                    selector = get_selector_suggestion(page, "post-login close button")
-                    logging.debug(f"AI selector for post-login close: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.click(selector)
-                    logging.info(f"Closed post-login popup with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI post-login close failed: {e}")
-                    logging.warning("No post-login close button found")
+                logging.warning("No post-login close button found")
 
         logging.info("Clicking My courses link")
         try:
@@ -558,16 +485,7 @@ def navigate_to_exam(page: Page, config: dict) -> bool:
                 logging.info("Clicked My courses link (fallback)")
             except Exception as e:
                 logging.error(f"Failed fallback My courses link: {e}")
-                logging.warning("Trying AI for My courses link")
-                try:
-                    selector = get_selector_suggestion(page, "My courses link")
-                    logging.debug(f"AI selector for My courses: {selector}")
-                    page.wait_for_selector(selector, timeout=7000)
-                    page.click(selector)
-                    logging.info(f"Clicked My courses link with AI selector: {selector}")
-                except Exception as e:
-                    logging.error(f"AI My courses link failed: {e}")
-                    logging.warning("No My courses link found")
+                logging.warning("No My courses link found")
 
         logging.info("Navigation completed")
         return True

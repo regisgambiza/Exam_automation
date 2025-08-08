@@ -1,0 +1,272 @@
+{
+  "q1": {
+    "question": "Which of the following is not a main purpose of educational quality assurance?",
+    "options": [
+      "To create satisfaction for the community and society.",
+      "To develop educational management based on the school\u2019s context.",
+      "To allow supervisory agencies to acknowledge the performance results of schools under their jurisdiction.",
+      "To evaluate whether the school\u2019s educational management passes or fails."
+    ]
+  },
+  "q2": {
+    "question": "Which of the following is not part of implementing an internal educational quality assurance system within a school?",
+    "options": [
+      "The school sets its own educational standards without having to match every standard announced by the Ministry of Education.",
+      "Preparing a school development plan for a period of 3\u20135 years.",
+      "Appointing knowledgeable and competent individuals responsible for establishing the school\u2019s quality assurance system.",
+      "Projects/activities listed in the annual operational plan can be adjusted as needed."
+    ]
+  },
+  "q3": {
+    "question": "What is the main concept of external quality assessment?",
+    "options": [
+      "Conducting evaluations according to the school\u2019s standards every year.",
+      "Monitoring and inspecting to reflect on the school\u2019s educational management for feedback purposes.",
+      "Building confidence among stakeholders every 5 years.",
+      "Evaluating based on evidence trails, adhering to central standards as the main benchmark."
+    ]
+  },
+  "q4": {
+    "question": "Which of the following statements is incorrect?",
+    "options": [
+      "Vision defines the future direction the school aspires to.",
+      "Mission only specifies the school\u2019s outputs.",
+      "Goals are what the school expects to achieve in the future.",
+      "Identity refers to characteristics that the school must instill in students upon completing each educational level."
+    ]
+  },
+  "q5": {
+    "question": "What is a characteristic of a good goal?",
+    "options": [
+      "Not too difficult for practitioners.",
+      "Timeframe for implementation can be flexible.",
+      "Requires creativity and innovation.",
+      "Should not be so specific that it becomes unattainable."
+    ]
+  },
+  "q6": {
+    "question": "Which of the following is not a benefit of setting educational standards for schools?",
+    "options": [
+      "Helps define clearer indicators for educational management.",
+      "Helps provide guidelines for developing the school\u2019s educational development plan.",
+      "Helps clearly define policies for educational development.",
+      "Serves as a tool for monitoring, inspection, and evaluation of operations."
+    ]
+  },
+  "q7": {
+    "question": "Which of the following is an example of setting school educational standards aligned with the school\u2019s context?",
+    "options": [
+      "Students at School A can listen, speak, read, and write Thai at 75%.",
+      "School B enables teachers to engage in knowledge exchange and provide feedback to improve teaching and learning.",
+      "Students at School C, upon completing Grade 6, can communicate at an international level.",
+      "The school develops teachers and staff to become experts in their professions."
+    ]
+  },
+  "q8": {
+    "question": "Which of the following is a component of the educational quality assurance system?",
+    "options": [
+      "Quality assurance, quality inspection, quality evaluation.",
+      "Quality development, monitoring and inspection, quality evaluation.",
+      "Data and information gathering, implementing plans, summarizing operational results.",
+      "Assigning responsible individuals for quality assurance work, operations, preparing operational reports."
+    ]
+  },
+  "q9": {
+    "question": "Which of the following is a standard in the area of school administration and management processes?",
+    "options": [
+      "Developing academic programs focusing on students\u2019 holistic quality according to the school curriculum for all target groups.",
+      "Managing learning through information technology media conducive to learning.",
+      "Providing systematic assessment and evaluation of students.",
+      "Managing classrooms positively."
+    ]
+  },
+  "q10": {
+    "question": "What is the correct understanding of Lesson Study (LS) among teachers?",
+    "options": [
+      "A teaching technique or instructional method.",
+      "A new form of teacher evaluation process that satisfies teachers.",
+      "Helps teachers produce many complete lesson plans.",
+      "The normal work of teachers collaborating with professional peers to jointly plan learning management."
+    ]
+  },
+  "q11": {
+    "question": "Which of the following describes classroom-level quality assurance and design?",
+    "options": [
+      "Teacher Koi is dedicated and determined in writing learner-centered lesson plans.",
+      "Teacher Kai devotes much effort to teaching, carefully checking every student\u2019s work each time.",
+      "Teacher King records the weekly behavior of every student, then analyzes it individually to adjust learning plans accordingly.",
+      "Teacher Kaew groups students voluntarily for easier teaching management without leaving anyone behind."
+    ]
+  },
+  "q12": {
+    "question": "What is the primary goal of teachers working with the Lesson Study process?",
+    "options": [
+      "An approach helping teachers create good lesson plans for teaching that fosters student understanding.",
+      "An approach in which teachers collaborate to study teaching content for deeper student understanding.",
+      "An innovation for teacher professional development and career advancement.",
+      "A concept in teacher professional development focusing on occasional teaching sessions."
+    ]
+  },
+  "q13": {
+    "question": "Which of the following is not an objective of classroom observation by a Buddy Teacher (BT)?",
+    "options": [
+      "To check whether all students are learning.",
+      "To see what the teacher does if any student is not learning.",
+      "To determine how the teacher knows that all students are learning.",
+      "To determine how the teacher knows that all students are learning."
+    ]
+  },
+  "q14": {
+    "question": "Preparing the school\u2019s self-assessment report is the duty of which group?",
+    "options": [
+      "Administrators, teachers, students, parents, support staff.",
+      "School committee, administrators, teachers, all school staff.",
+      "Supervisory agency, parents\u2019 association, administrators, teachers.",
+      "School management committee, administrators, teachers, parents"
+    ]
+  },
+  "q15": {
+    "question": "The Good Quality School analyzed data using the TOWS Matrix as follows\n\nBased on the TOWS Matrix, which strategic issue should the school determine?",
+    "options": [
+      "Develop communities and learning resources appropriate to the school context.",
+      "Improve management efficiency in cooperation with the community.",
+      "Develop student-centered teaching and learning processes.",
+      "Instill desirable values and characteristics in students."
+    ]
+  },
+  "q16": {
+    "question": "The Good Quality School analyzed data using the TOWS Matrix as follows\n\nBased on the TOWS Matrix, which is an example of an aggressive (SO) strategy?",
+    "options": [
+      "Promote students\u2019 physical and mental health in cooperation with community health agencies.",
+      "Consistently develop students\u2019 analytical thinking skills.",
+      "Improve teaching and learning activities using diverse methods and community learning resources.",
+      "Foster close cooperation between home and school."
+    ]
+  },
+  "q17": {
+    "question": "Teacher Sarita conducts teaching by allowing students to learn through hands-on practice until they can summarize knowledge themselves, then use that learning to produce work or projects. What is this learning approach called?",
+    "options": [
+      "Learner-centered learning.",
+      "Student-centered learning.",
+      "Active learning for competency development.",
+      "Knowledge transfer-based learning."
+    ]
+  },
+  "q18": {
+    "question": "In designing learning activities to write meaningful lesson plans, where should the teacher begin?",
+    "options": [
+      "Defining assessment approaches for creating outputs linked to indicators.",
+      "Identifying learning objectives to guide activity design.",
+      "Defining the content or concepts to be conveyed.",
+      "Defining the approach for organizing learning activities to maximize student participation."
+    ]
+  },
+  "q19": {
+    "question": "A quality lesson plan that enables meaningful learning should have which characteristic?",
+    "options": [
+      "Activities link new experiences to prior experiences according to constructivist theory.",
+      "Activities help students understand concepts rather than merely memorizing facts.",
+      "Activities engage students in fun, lively, and exciting experiences.",
+      "Both A and B."
+    ]
+  },
+  "q20": {
+    "question": "Co-5STEPs teaching is a powerful instructional approach suitable for teachers\u2019 practice because it is supported by which learning theories that emphasize strong students helping weaker ones?",
+    "options": [
+      "Co-operative theory and Construction theory.",
+      "Progressivism and Construction theory.",
+      "Constructionism and Constructivism.",
+      "Social Constructive theory and Theory of Construction."
+    ]
+  },
+  "q21": {
+    "question": "Which of the following statements is incorrect regarding universal educational quality assurance?",
+    "options": [
+      "It emphasizes purposeful operations.",
+      "It uses empirical data as a basis for continuous quality improvement.",
+      "It develops quality from a systemic and holistic perspective.",
+      "It is a quality assurance system uniformly applied worldwide."
+    ]
+  },
+  "q22": {
+    "question": "Which of the following statements about S.M.A.R.T. goal setting is incorrect?",
+    "options": [
+      "S = Specific, meaning precise and clear.",
+      "M = Measurable, meaning measurable in numbers and clearly comparable.",
+      "R = Reasonable or rational.",
+      "T = Timely, meaning it has a definite timeframe."
+    ]
+  },
+  "q23": {
+    "question": "Which of the following is the first step in strategic planning?",
+    "options": [
+      "Analyzing problems, obstacles, and the school\u2019s needs using SWOT and TOWS.",
+      "Preparing the annual operational plan.",
+      "Implementing the plan.",
+      "Monitoring and inspecting operations."
+    ]
+  },
+  "q24": {
+    "question": "Which of the following is incorrect regarding the monitoring and inspection of educational quality?",
+    "options": [
+      "Quality inspections are conducted for each activity, covering all school missions.",
+      "Monitoring and inspection should take place only after operations are completed to check whether goals are met.",
+      "A committee should be appointed to conduct monitoring and inspection.",
+      "Teachers and staff executing annual or project-based operational plans should inspect their own performance as scheduled in the calendar."
+    ]
+  },
+  "q25": {
+    "question": "Which of the following is incorrect?",
+    "options": [
+      "SWOT is an analysis to determine the organization\u2019s future direction.",
+      "Vision is a broad future image of the desired state.",
+      "Mission defines the roles and functions the school will undertake to achieve the vision, both in the present and future.",
+      "A school\u2019s educational development strategies must specify target indicators."
+    ]
+  },
+  "q26": {
+    "question": "What is the most significant benefit a school gains from quality assurance?",
+    "options": [
+      "The school continuously improves quality, gaining confidence from all sectors in delivering quality education to students as promised.",
+      "The school\u2019s administrators receive higher performance evaluations.",
+      "Students achieve national learning outcomes above the national average.",
+      "The school becomes more competitive with other schools."
+    ]
+  },
+  "q27": {
+    "question": "Which of the following reflects the benefits the community receives from the school\u2019s educational quality assurance?",
+    "options": [
+      "The school seriously manages education, resulting in community students of recognized quality.",
+      "The school and community have a good relationship.",
+      "The school manages education that meets community needs.",
+      "All of the above."
+    ]
+  },
+  "q28": {
+    "question": "Which of the following is data used in evaluating school quality?",
+    "options": [
+      "Number of school personnel.",
+      "Percentage of students achieving learning outcomes.",
+      "Individual student academic achievement results.",
+      "Names of school board members attending meetings."
+    ]
+  },
+  "q29": {
+    "question": "Which of the following is the most appropriate use of school quality assessment results?\n1) Administrators use them to communicate and raise awareness during staff meetings.\n2) All personnel use them as basic information for creating various projects.\n3) Administrators compile them as school records.",
+    "options": [
+      "1) and 2) are correct.",
+      "2) and 3) are correct.",
+      "1) and 3) are correct.",
+      "1), 2), and 3) are correct."
+    ]
+  },
+  "q30": {
+    "question": "Which of the following statements is incorrect regarding the benefits of educational quality assurance?",
+    "options": [
+      "Administrators manage systematically and in a way that can be audited.",
+      "Learners are fully developed to their potential.",
+      "Teachers responsible for quality assurance automatically gain higher professional ranks.",
+      "Schools develop a collaborative working culture."
+    ]
+  }
+}

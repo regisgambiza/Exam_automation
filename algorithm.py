@@ -2,355 +2,382 @@ import json
 import logging
 import random
 import time
-from datetime import datetime
-from typing import List, Dict, Set, Tuple, Optional
-import math
-import numpy as np
+from typing import Dict, List
 import os
+import ollama
+import re
 
-class AdaptiveGreedyExamSolver:
-    def __init__(self, num_questions: int = 30, num_options: int = 4, max_stuck_attempts: int = 10, exploration_rate: float = 0.1, max_changes_per_guess: int = 3, confidence_threshold: float = 0.9, log_mode: str = "overwrite"):
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def extract_from_page(page):
+    """Extract question and choices from the page."""
+    logging.debug("Extracting question and choices from page")
+    try:
+        q_p = page.locator("div.container.app div.question p")
+        q_p.first.wait_for(state="visible", timeout=5000)
+        question_text = "\n".join(q_p.all_inner_texts())
+        choices = page.locator("div.choice p").all_inner_texts()
+        logging.debug(f"Found question with {len(choices)} choices")
+        return question_text, choices
+    except Exception as e:
+        logging.error(f"Failed to extract question and choices: {e}")
+        return None, []
+
+class SimpleGreedyExamSolver:
+    def __init__(self, num_questions: int = 30, num_options: int = 4):
         self.num_questions = num_questions
         self.num_options = num_options
-        self.max_stuck_attempts = max_stuck_attempts
-        self.exploration_rate = exploration_rate
-        self.max_changes_per_guess = max_changes_per_guess
-        self.confidence_threshold = confidence_threshold
         self.best_score = 0
-        self.best_answers = [1] * num_questions
-        self.correct_answers = [None] * num_questions
-        self.stuck_counter = 0
-        self.tested_options: Dict[int, Set[int]] = {i: set() for i in range(num_questions)}
-        self.option_scores: Dict[int, Dict[int, float]] = {i: {opt: 1.0 for opt in range(1, num_options + 1)} for i in range(num_questions)}
-        self.attempts: List[Dict[str, any]] = []
+        self.best_answers = [1] * num_questions  # Current best answers
+        self.correct_answers = [None] * num_questions  # Confirmed correct answers
+        self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(num_questions)}  # Per-question memory
+        self.questions_file = "questions_database.json"
+        self.memory_file = "solver_memory.json"
+        self.attempts = []  # Store attempt history
         self.start_time = time.time()
-        self.guess_history: Set[str] = set()
-        self.test_mode = False
-        self.clusters: List[List[int]] = []
-        self.log_mode = log_mode
-        self.state_file = "solver_state.json"
-        self.load_state()
-        logging.debug(f"Initialized solver: {num_questions} questions, {num_options} options, max_stuck_attempts={max_stuck_attempts}, exploration_rate={exploration_rate}, max_changes_per_guess={max_changes_per_guess}, confidence_threshold={confidence_threshold}, log_mode={log_mode}")
+        self.load_memory()  # Load saved memory if available
+        logging.debug(f"Initialized solver: {num_questions} questions, {num_options} options")
 
-    def set_test_mode(self, correct_answers: List[int]) -> None:
-        self.test_mode = True
-        self.test_correct_answers = correct_answers
-        logging.info(f"Test mode enabled with correct answers: {correct_answers}")
-
-    def load_state(self) -> None:
-        if os.path.exists(self.state_file):
-            try:
-                with open(self.state_file, "r") as f:
-                    state = json.load(f)
-                self.correct_answers = state.get("correct_answers", [None] * self.num_questions)
-                self.tested_options = {int(k): set(v) for k, v in state.get("tested_options", {}).items()}
-                self.attempts = state.get("attempts", [])[-10:]
-                self.best_score = state.get("last_score", 0)
-                self.best_answers = state.get("best_answers", [1] * self.num_questions)
-                self.guess_history = set(state.get("guess_history", []))
-                self.option_scores = {int(k): {int(opt): score for opt, score in v.items()} for k, v in state.get("option_scores", {}).items()}
-                self.stuck_counter = state.get("stuck_counter", 0)
-                logging.info(f"Loaded state from {self.state_file}: best_score={self.best_score}, confirmed={sum(1 for ans in self.correct_answers if ans is not None)}/{self.num_questions}")
-            except Exception as e:
-                logging.error(f"Failed to load state from {self.state_file}: {e}")
-                self._initialize_default_state()
-        else:
-            self._initialize_default_state()
-
-    def _initialize_default_state(self) -> None:
-        self.correct_answers = [None] * self.num_questions
-        self.tested_options = {i: set() for i in range(self.num_questions)}
-        self.option_scores = {i: {opt: 1.0 for opt in range(1, self.num_options + 1)} for i in range(self.num_questions)}
-        self.attempts = []
-        self.best_score = 0
-        self.best_answers = [1] * self.num_questions
-        self.guess_history = set()
-        self.stuck_counter = 0
-        logging.debug("Initialized default solver state.")
-
-    def save_state(self) -> None:
-        state = {
-            "correct_answers": self.correct_answers,
-            "tested_options": {str(i): list(self.tested_options[i]) for i in range(self.num_questions)},
-            "attempts": self.attempts[-10:],
-            "last_score": self.best_score,
-            "best_answers": self.best_answers,
-            "guess_history": list(self.guess_history)[-100:],
-            "option_scores": {str(i): self.option_scores[i] for i in range(self.num_questions)},
-            "stuck_counter": self.stuck_counter,
-            "question_entropy": {str(i): self._compute_confidence(i)[1] for i in range(self.num_questions)}
-        }
-        try:
-            with open(self.state_file, "w") as f:
-                json.dump(state, f, indent=2)
-            logging.debug(f"Saved state to {self.state_file}")
-        except Exception as e:
-            logging.error(f"Failed to save state to {self.state_file}: {e}")
-
-    def _compute_confidence(self, question: int) -> Tuple[float, float]:
-        scores = [self.option_scores[question][opt] for opt in range(1, self.num_options + 1)]
-        total = sum(scores)
-        if total == 0:
-            return 0.0, 1.0
-        probs = [s / total for s in scores]
-        max_prob = max(probs)
-        entropy = -sum(p * math.log2(p) for p in probs if p > 0)
-        uncertainty = entropy / math.log2(self.num_options)
-        return max_prob, uncertainty
-
-    def _cluster_questions(self) -> None:
-        uncertainties = [(i, self._compute_confidence(i)[1]) for i in range(self.num_questions) if self.correct_answers[i] is None]
-        if not uncertainties:
-            self.clusters = []
-            return
-        uncertainties.sort(key=lambda x: x[1], reverse=True)
-        num_clusters = min(3, len(uncertainties))
-        cluster_size = max(1, len(uncertainties) // num_clusters)
-        self.clusters = [uncertainties[i:i + cluster_size] for i in range(0, len(uncertainties), cluster_size)]
-        self.clusters = [[i for i, _ in cluster] for cluster in self.clusters]
-        logging.debug(f"Clustered questions: {self.clusters}")
-
-    def generate_guess(self) -> List[int]:
-        logging.debug("Generating guess...")
-        guess = self.best_answers.copy()
-        unknown_indices = [i for i in range(self.num_questions) if self.correct_answers[i] is None]
-        
-        if not unknown_indices:
-            logging.info("No unknown answers remain. Returning best answers.")
-            return guess
-
-        num_changes = random.randint(1, min(self.max_changes_per_guess, len(unknown_indices)))
-        confidences = [(i, self._compute_confidence(i)) for i in unknown_indices]
-        confidences.sort(key=lambda x: x[1][1], reverse=True)
-        change_indices = [i for i, _ in confidences[:num_changes]]
-
-        if random.random() < self.exploration_rate:
-            logging.debug("Exploration mode: making random changes")
-            for i in change_indices:
-                options = list(range(1, self.num_options + 1))
-                weights = [1.0 / (self.option_scores[i][opt] + 1e-10) for opt in options]
-                guess[i] = random.choices(options, weights=weights, k=1)[0]
-                self.tested_options[i].add(guess[i])
-        else:
-            for i in change_indices:
-                options = [opt for opt in range(1, self.num_options + 1) if opt not in self.tested_options[i]]
-                if not options:
-                    logging.debug(f"All options tested for Q{i + 1}. Resetting tested options.")
-                    self.tested_options[i].clear()
-                    options = list(range(1, self.num_options + 1))
-                weights = [self.option_scores[i][opt] + 1e-10 for opt in options]
-                guess[i] = random.choices(options, weights=weights, k=1)[0]
-                self.tested_options[i].add(guess[i])
-
-        guess_str = str(guess)
-        if guess_str in self.guess_history:
-            logging.debug("Guess already tried. Generating new guess.")
-            if len(self.guess_history) > 1000:  # Prevent infinite recursion
-                logging.warning("Guess history too large. Clearing to avoid infinite loop.")
-                self.guess_history.clear()
-            return self.generate_guess()
-        self.guess_history.add(guess_str)
-        self.last_changed_indices = change_indices
-        logging.debug(f"Generated guess: {guess}, changed indices: {change_indices}")
-        return guess
-
-    def _evaluate_guess(self, guess: List[int]) -> Tuple[str, Optional[str]]:
-        for retry in range(3):
-            try:
-                if self.test_mode:
-                    score = sum(1 for a, c in zip(guess, self.test_correct_answers) if a == c)
-                    return "Done", f"{score}/{self.num_questions}"
-                result_text, score_text = self.exam_callback(guess)
-                if not score_text or '/' not in score_text:
-                    raise ValueError(f"Invalid score text: {score_text}")
-                score = int(score_text.split('/')[0])
-                if score < 0 or score > self.num_questions:
-                    raise ValueError(f"Invalid score value: {score}")
-                return result_text, score_text
-            except Exception as e:
-                logging.warning(f"exam_callback failed for {guess} (retry {retry + 1}/3): {e}")
-                if retry == 2:
-                    return "Error", None
-                time.sleep(2 ** retry)
-        return "Error", None
-
-    def update_with_score(self, answers: List[int], score: int, changed_indices: List[int]) -> None:
-        self.attempts.append({"answers": answers.copy(), "score": score, "changed_indices": changed_indices})
-        if score > self.best_score:
-            logging.info(f"New best score: {score}/{self.num_questions}, updating best_answers: {answers}, changed: {changed_indices}")
-            self.best_score = score
-            self.best_answers = answers.copy()
-            self.stuck_counter = 0
-            for i in changed_indices:
-                if self.correct_answers[i] is None:
-                    self.option_scores[i][answers[i]] += 1.0
-        else:
-            self.stuck_counter += 1
-            for i in changed_indices:
-                if self.correct_answers[i] is None:
-                    self.option_scores[i][answers[i]] = max(0, self.option_scores[i][answers[i]] - 0.2)
-            logging.debug(f"Score {score}/{self.num_questions} <= best_score {self.best_score}/{self.num_questions}, stuck_counter: {self.stuck_counter}")
-        self.save_state()
-
-    def mark_correct(self, score: int, answers: List[int], changed_indices: List[int]) -> None:
-        if len(self.attempts) < 2:
-            logging.debug("Not enough attempts to mark correct answers.")
-            return
-        prev_score = self.attempts[-2]["score"]
-        prev_answers = self.attempts[-2]["answers"]
-        logging.debug(f"Comparing scores: current={score}, previous={prev_score}")
-        if score > prev_score:
-            if len(changed_indices) == 1:
-                i = changed_indices[0]
-                if self.correct_answers[i] is None:
-                    val = answers[i]
-                    self.correct_answers[i] = val
-                    logging.info(f"Q{i + 1}: Marked {val} as correct (score improved from {prev_score} to {score})")
-                    self.tested_options[i].clear()
-                    self.tested_options[i].add(val)
-                    self.option_scores[i][val] += 2.0
-            elif score - prev_score <= len(changed_indices):
-                logging.debug(f"Multiple changes {changed_indices}, score diff {score - prev_score}. Probing to confirm.")
-                for i in changed_indices:
-                    if self.correct_answers[i] is None:
-                        new_guess = self.best_answers.copy()
-                        new_guess[i] = answers[i]
-                        result_text, score_text = self._evaluate_guess(new_guess)
-                        if score_text:
-                            score_new = int(score_text.split('/')[0])
-                            if score_new > self.best_score:
-                                self.correct_answers[i] = answers[i]
-                                logging.info(f"Q{i + 1}: Confirmed {answers[i]} as correct via probing")
-                                self.tested_options[i].clear()
-                                self.tested_options[i].add(answers[i])
-                                self.option_scores[i][answers[i]] += 2.0
-                                self.update_with_score(new_guess, score_new, [i])
-        self.save_state()
-
-    def _should_stop_early(self) -> bool:
-        confirmed = sum(1 for ans in self.correct_answers if ans is not None)
-        confidences = [self._compute_confidence(i)[0] for i in range(self.num_questions) if self.correct_answers[i] is None]
-        high_confidence = all(c >= self.confidence_threshold for c in confidences) if confidences else True
-        stalled = self.stuck_counter > self.max_stuck_attempts * 2 and self.best_score == self.attempts[-1]["score"] if self.attempts else False
-        logging.debug(f"Early stopping check: confirmed={confirmed}/{self.num_questions}, high_confidence={high_confidence}, stalled={stalled}")
-        return confirmed >= self.num_questions * 0.9 or (high_confidence and stalled)
-
-    def fill_remaining_with_best(self) -> None:
-        for i in range(self.num_questions):
-            if self.correct_answers[i] is None:
-                best_option = max(range(1, self.num_options + 1), key=lambda opt: self.option_scores[i][opt])
-                self.correct_answers[i] = best_option
-                logging.debug(f"Q{i + 1}: Filled with best option {best_option} (score: {self.option_scores[i][best_option]})")
-        self.save_state()
-
-    def export_log(self) -> None:
-        confirmed = [i + 1 for i, ans in enumerate(self.correct_answers) if ans is not None]
-        guessed = [i + 1 for i, ans in enumerate(self.correct_answers) if ans is None]
-        last_attempt = self.attempts[-1] if self.attempts else {"score": 0, "changed_indices": []}
-        summary = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "total_attempts": len(self.attempts),
-            "time_elapsed_seconds": round(time.time() - self.start_time, 2),
+    def save_memory(self):
+        """Save memory and progress to disk."""
+        progress = {
             "best_score": self.best_score,
-            "confirmed_questions": confirmed,
-            "guessed_questions": guessed,
-            "unique_guesses": len(self.guess_history),
-            "last_changed_indices": last_attempt.get("changed_indices", []),
-            "clusters": self.clusters
+            "best_answers": self.best_answers,
+            "correct_answers": self.correct_answers,
+            "memory": {str(k): {"options": {str(opt): score for opt, score in v["options"].items()},
+                               "best_option": v["best_option"], "best_score": v["best_score"]}
+                       for k, v in self.memory.items()}
         }
-        log_entry = f"Summary: {json.dumps(summary, indent=2)}\n"
         try:
-            mode = "w" if self.log_mode == "overwrite" else "a"
-            with open("solver.log", mode) as f:
-                if mode == "a" and os.path.getsize("solver.log") > 0:
-                    f.write("\n---\n")
-                f.write(log_entry)
-            logging.debug(f"Log written to solver.log in {self.log_mode} mode: {summary}")
+            with open(self.memory_file, "w") as f:
+                json.dump(progress, f, indent=2)
+            logging.debug(f"Saved memory to {self.memory_file}")
         except Exception as e:
-            logging.error(f"Failed to write to solver.log: {e}")
+            logging.error(f"Failed to save memory: {e}")
 
-    def solve(self, exam_callback) -> List[int]:
-        self.exam_callback = exam_callback
-        attempt_num = len(self.attempts) + 1
-        temperature = 1.0
-        cooling_rate = 0.95
+    def load_memory(self):
+        """Load memory and progress from disk if available and not empty."""
+        if os.path.exists(self.memory_file) and os.path.getsize(self.memory_file) > 0:
+            try:
+                with open(self.memory_file, "r") as f:
+                    progress = json.load(f)
+                self.best_score = progress.get("best_score", 0)
+                self.best_answers = progress.get("best_answers", [1] * self.num_questions)
+                self.correct_answers = progress.get("correct_answers", [None] * self.num_questions)
+                self.memory = {
+                    int(k): {
+                        "options": {int(opt): score for opt, score in v["options"].items()},
+                        "best_option": v["best_option"],
+                        "best_score": v["best_score"]
+                    } for k, v in progress.get("memory", {}).items()
+                }
+                confirmed_count = sum(1 for ans in self.correct_answers if ans is not None)
+                logging.info(f"Loaded memory: best_score={self.best_score}, "
+                             f"confirmed={confirmed_count}/{self.num_questions}")
+            except Exception as e:
+                logging.error(f"Failed to load memory: {e}")
+                # Reset to default state on load failure
+                self.best_score = 0
+                self.best_answers = [1] * self.num_questions
+                self.correct_answers = [None] * self.num_questions
+                self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(self.num_questions)}
+        else:
+            logging.info(f"No valid {self.memory_file} found, initializing with default state")
 
-        while self.best_score < self.num_questions and attempt_num <= 1000:
-            if all(self.correct_answers):
-                logging.info("All correct answers identified. Terminating early.")
-                break
-            if self._should_stop_early():
-                logging.info("Early stopping triggered.")
-                break
-            logging.info(f"Attempt {attempt_num}, temperature={temperature:.3f}")
-            
-            guesses = [self.generate_guess() for _ in range(min(3, len([i for i in range(self.num_questions) if self.correct_answers[i] is None])))]
-            guesses = [g for g in guesses if str(g) not in self.guess_history]
-            if not guesses:
-                logging.debug("No new unique guesses generated. Forcing new guess.")
-                guesses = [self.generate_guess()]
+    def retrieve_questions(self, page) -> Dict:
+        """Retrieve questions and options if JSON is missing or empty."""
+        if os.path.exists(self.questions_file) and os.path.getsize(self.questions_file) > 0:
+            try:
+                with open(self.questions_file, "r") as f:
+                    questions_data = json.load(f)
+                if questions_data and len(questions_data) == self.num_questions:
+                    logging.info(f"Loaded {len(questions_data)} questions from {self.questions_file}")
+                    return questions_data
+            except Exception as e:
+                logging.error(f"Failed to load questions from {self.questions_file}: {e}")
 
-            for guess in guesses:
+        logging.info("Retrieving questions from exam page...")
+        questions_data = {}
+        try:
+            for q_idx in range(self.num_questions):
+                question_text, options = extract_from_page(page)
+                if question_text is None or len(options) != self.num_options:
+                    logging.error(f"Failed to retrieve Q{q_idx + 1}: question_text={question_text}, options={options}")
+                    continue
+                questions_data[f"q{q_idx + 1}"] = {
+                    "question": question_text,
+                    "options": options
+                }
+                logging.debug(f"Retrieved Q{q_idx + 1}: {question_text} with {len(options)} options")
+                if q_idx < self.num_questions - 1:
+                    page.get_by_role('button', name='Next >').click(timeout=1000)
+                    page.wait_for_timeout(500)
+            with open(self.questions_file, "w") as f:
+                json.dump(questions_data, f, indent=2)
+            logging.info(f"Saved {len(questions_data)} questions to {self.questions_file}")
+        except Exception as e:
+            logging.error(f"Failed to retrieve questions: {e}")
+        return questions_data
+
+    def ai_debate_answers(self, questions_data: Dict) -> List[int]:
+        """Use multiple Ollama models with weighted voting for initial answers."""
+        models = [
+            ("llama3.1:8b", 1.4),
+            ("gemma2:9b", 1.3),
+            ("qwen2:7b-instruct-q4_0", 1.2),
+            ("mistral:7b-instruct-q4_0", 1.0),
+            ("phi3:latest", 0.9)
+        ]
+        answers = [1] * self.num_questions
+        logging.info("Starting AI debate for initial answers...")
+
+        for q_idx in range(self.num_questions):
+            q_key = f"q{q_idx + 1}"
+            if q_key not in questions_data:
+                logging.warning(f"Question {q_key} not found in data")
+                continue
+
+            question = questions_data[q_key]["question"]
+            options = questions_data[q_key]["options"]
+            prompt = (
+                f"You are answering a multiple-choice question.\n"
+                f"Question: {question}\n"
+                f"Options:\n" +
+                "\n".join([f"{i + 1}. {opt}" for i, opt in enumerate(options)]) +
+                "\nPick the best option (1-4) and briefly explain why, but put ONLY the number on the first line."
+            )
+
+            weighted_votes = {}
+            for model, weight in models:
                 try:
-                    result_text, score_text = self._evaluate_guess(guess)
-                    if score_text is None:
-                        logging.warning(f"Invalid score for guess {guess}. Skipping.")
-                        continue
-                    score = int(score_text.split('/')[0])
-                    logging.debug(f"Evaluated guess {guess}: score={score}/{self.num_questions}")
-                    changed_indices = [i for i, (a, b) in enumerate(zip(guess, self.best_answers)) if a != b]
-                    self.update_with_score(guess, score, changed_indices)
-                    self.mark_correct(score, guess, changed_indices)
+                    response = ollama.chat(model=model, messages=[{"role": "user", "content": prompt}])
+                    response_text = response['message']['content'].strip()
+                    match = re.search(r'\b[1-4]\b', response_text)
+                    if match:
+                        answer = int(match.group(0))
+                        weighted_votes[answer] = weighted_votes.get(answer, 0) + weight
+                        logging.debug(f"Model {model} ({weight}x) answered {answer} for Q{q_idx + 1}")
+                    else:
+                        logging.warning(f"Invalid answer format '{response_text}' from {model} for Q{q_idx + 1}")
                 except Exception as e:
-                    logging.warning(f"Error evaluating guess {guess}: {e}")
+                    logging.error(f"Model {model} failed for Q{q_idx + 1}: {e}")
 
-            self._cluster_questions()
-            self.export_log()
+            if weighted_votes:
+                best_answer = max(weighted_votes.items(), key=lambda x: x[1])[0]
+                answers[q_idx] = best_answer
+            else:
+                answers[q_idx] = random.randint(1, self.num_options)
+                logging.warning(f"Q{q_idx + 1}: No valid model answers, using random option {answers[q_idx]}")
 
+        logging.info(f"AI debate completed: Initial answers {answers}")
+        return answers
+
+    def try_option_for_question(self, question_idx: int, option: int, exam_callback) -> int:
+        """Try a specific option for a given question and return the score."""
+        guess = self.best_answers.copy()
+        guess[question_idx] = option
+        logging.debug(f"Trying Q{question_idx + 1} with option {option}")
+        try:
+            result_text, score_text = exam_callback(guess)
+            if score_text is None or '/' not in score_text:
+                logging.warning(f"Invalid score format: {score_text} for Q{question_idx + 1}, option {option}")
+                return 0
+            score = int(score_text.split('/')[0])
+            logging.debug(f"Q{question_idx + 1}, option {option} scored {score}/{self.num_questions}")
+            return score
+        except Exception as e:
+            logging.error(f"Error evaluating Q{question_idx + 1}, option {option}: {e}")
+            return 0
+
+    def systematic_trial_phase(self, exam_callback, attempt_num: int) -> bool:
+        """Try all options for each question systematically, updating memory."""
+        improved = False
+        changed_questions = []
+        failed_options = []
+
+        for q_idx in range(self.num_questions):
+            if self.correct_answers[q_idx] is not None:
+                logging.debug(f"Q{q_idx + 1} already confirmed as option {self.correct_answers[q_idx]} ✅")
+                continue
+
+            # Try each untried option for this question
+            untried_options = [opt for opt in range(1, self.num_options + 1)
+                               if opt not in self.memory[q_idx]["options"]]
+            if not untried_options:
+                logging.debug(f"Q{q_idx + 1}: All options tried")
+                continue
+
+            logging.info(f"Systematic trial for Q{q_idx + 1}: Testing options {untried_options}")
+            prev_option = self.best_answers[q_idx]
+            for option in untried_options:
+                score = self.try_option_for_question(q_idx, option, exam_callback)
+                self.memory[q_idx]["options"][option] = score
+                logging.info(f"Q{q_idx + 1}, option {option}: Score={score}/{self.num_questions}")
+
+                # Track changed questions
+                if option != prev_option:
+                    changed_questions.append((q_idx, prev_option, option))
+
+                # Update best option for this question
+                if score > self.memory[q_idx]["best_score"]:
+                    self.memory[q_idx]["best_score"] = score
+                    self.memory[q_idx]["best_option"] = option
+                    logging.info(f"Q{q_idx + 1}: New best option {option} with score {score} 🆕")
+                    improved = True
+
+                # Update global best if overall score improves
+                if score > self.best_score:
+                    self.best_score = score
+                    self.best_answers = self.best_answers.copy()
+                    self.best_answers[q_idx] = option
+                    logging.info(f"New global best score: {self.best_score}/{self.num_questions} 🌟")
+                    # Confirm correct answers for this question if score is high enough
+                    if score == self.num_questions:
+                        self.correct_answers[q_idx] = option
+                        logging.info(f"Q{q_idx + 1}: Confirmed correct answer {option} ✅")
+                    self.save_memory()
+                elif score < self.best_score:
+                    failed_options.append((q_idx, option))
+
+                # Update best answer for this question based on memory
+                self.best_answers[q_idx] = self.memory[q_idx]["best_option"]
+
+            if self.best_score == self.num_questions:
+                logging.info("Perfect score achieved! Stopping systematic trial.")
+                break
+
+        # Log comprehensive summary report
+        self.log_summary_report(attempt_num, changed_questions, failed_options)
+
+        self.save_memory()
+        return improved
+
+    def random_forced_change(self):
+        """Make a random change to escape local maxima."""
+        changeable_indices = [i for i, ans in enumerate(self.correct_answers) if ans is None]
+        if not changeable_indices:
+            logging.info("No questions left to change (all confirmed)")
+            return False, []
+
+        q_idx = random.choice(changeable_indices)
+        current_option = self.best_answers[q_idx]
+        possible_options = [opt for opt in range(1, self.num_options + 1) if opt != current_option]
+        if not possible_options:
+            logging.debug(f"Q{q_idx + 1}: No alternative options available")
+            return False, []
+
+        new_option = random.choice(possible_options)
+        self.best_answers[q_idx] = new_option
+        logging.info(f"Forced random change: Q{q_idx + 1} changed from {current_option} to {new_option} 🔄")
+        self.save_memory()
+        return True, [(q_idx, current_option, new_option)]
+
+    def log_summary_report(self, attempt_num: int, changed_questions: List, failed_options: List):
+        """Log a comprehensive summary report for the attempt."""
+        elapsed_time = time.time() - self.start_time
+        minutes, seconds = divmod(elapsed_time, 60)
+        confirmed_count = sum(1 for ans in self.correct_answers if ans is not None)
+        confirmed_percentage = (confirmed_count / self.num_questions) * 100
+        unknown_count = self.num_questions - confirmed_count
+
+        logging.info(f"\n=== Summary Report for Attempt {attempt_num} ===")
+        logging.info(f"Attempt Number & Score:")
+        logging.info(f"  - Attempt: {attempt_num}")
+        logging.info(f"  - Score: {self.best_score}/{self.num_questions}")
+
+        logging.info(f"\nChanged Questions This Attempt:")
+        if changed_questions:
+            for q_idx, prev_option, new_option in changed_questions:
+                logging.info(f"  - Q{q_idx + 1}: Changed from option {prev_option} to {new_option}")
+        else:
+            logging.info(f"  - No questions changed")
+
+        logging.info(f"\nConfirmed Correct Answers So Far:")
+        logging.info(f"  - Count: {confirmed_count}/{self.num_questions} ({confirmed_percentage:.1f}%)")
+        confirmed_list = [f"Q{i + 1}: {ans}" for i, ans in enumerate(self.correct_answers) if ans is not None]
+        if confirmed_list:
+            logging.info(f"  - Confirmed answers: {', '.join(confirmed_list)}")
+        else:
+            logging.info(f"  - No answers confirmed yet")
+
+        logging.info(f"\nFailed Answers Tried This Attempt:")
+        if failed_options:
+            for q_idx, option in failed_options:
+                logging.info(f"  - Q{q_idx + 1}: Option {option} rejected (score={self.memory[q_idx]['options'][option]})")
+        else:
+            logging.info(f"  - No failed options this attempt")
+
+        logging.info(f"\nOverall Progress Summary:")
+        logging.info(f"  - Confirmed answers: {confirmed_count}/{self.num_questions}")
+        logging.info(f"  - Unknown questions left: {unknown_count}")
+        logging.info(f"  - Best score so far: {self.best_score}/{self.num_questions}")
+        logging.info(f"  - Elapsed time: {int(minutes)}m {int(seconds)}s")
+        logging.info(f"============================\n")
+
+    def solve(self, exam_callback, page) -> List[int]:
+        """Solve the exam using systematic trials and random changes to escape local maxima."""
+        logging.info("Starting exam solver")
+        self.exam_callback = exam_callback
+
+        # Load questions
+        questions_data = self.retrieve_questions(page)
+
+        # Initialize with AI answers only if memory is empty or no confirmed answers
+        if not any(self.correct_answers) and not any(self.memory[i]["options"] for i in range(self.num_questions)):
+            logging.info("No confirmed answers or memory, initializing with AI answers")
+            self.best_answers = self.ai_debate_answers(questions_data)
+            for q_idx, option in enumerate(self.best_answers):
+                self.memory[q_idx]["best_option"] = option
+            # Test initial AI answers
+            score = self.try_option_for_question(0, self.best_answers[0], exam_callback)
+            self.memory[0]["options"][self.best_answers[0]] = score
+            self.best_score = score
+            logging.info(f"Initial AI answers score: {score}/{self.num_questions}")
+            self.save_memory()
+
+        attempt_num = 1
+        while self.best_score < self.num_questions:
+            if all(self.correct_answers):
+                logging.info("All answers confirmed, stopping early")
+                break
+
+            logging.info(f"Attempt {attempt_num}: Starting systematic trial phase")
+            improved = self.systematic_trial_phase(exam_callback, attempt_num)
             if self.best_score == self.num_questions:
                 logging.info("Perfect score achieved!")
                 break
 
-            if self.stuck_counter >= self.max_stuck_attempts and self.clusters:
-                logging.info(f"Stuck for {self.stuck_counter} attempts. Brute-forcing clusters: {self.clusters}")
-                for cluster in self.clusters:
-                    if not cluster:
-                        continue
-                    logging.info(f"Brute-forcing cluster: {cluster}")
-                    for opt_combination in np.ndindex(*[self.num_options] * min(3, len(cluster))):  # Limit cluster size
-                        new_guess = self.best_answers.copy()
-                        for idx, opt in zip(cluster[:3], opt_combination):
-                            option = opt + 1
-                            if option in self.tested_options[idx]:
-                                continue
-                            new_guess[idx] = option
-                            self.tested_options[idx].add(option)
-                        guess_str = str(new_guess)
-                        if guess_str in self.guess_history:
-                            continue
-                        self.guess_history.add(guess_str)
-                        logging.debug(f"Testing cluster {cluster} with {new_guess}")
-                        result_text, score_text = self._evaluate_guess(new_guess)
-                        if score_text:
-                            score = int(score_text.split('/')[0])
-                            logging.debug(f"Cluster brute-force result: score={score}/{self.num_questions}")
-                            self.update_with_score(new_guess, score, cluster[:3])
-                            if score > self.best_score:
-                                for idx, opt in zip(cluster[:3], opt_combination):
-                                    if self.correct_answers[idx] is None:
-                                        self.correct_answers[idx] = opt + 1
-                                        logging.info(f"Q{idx + 1}: Confirmed {opt + 1} as correct via cluster brute-force")
-                                        self.tested_options[idx].clear()
-                                        self.tested_options[idx].add(opt + 1)
-                                        self.option_scores[idx][opt + 1] += 2.0
-                                break
-                    self.export_log()
-                self.stuck_counter = 0
+            if not improved:
+                logging.info("No improvements from systematic trials, attempting random forced change")
+                success, changed_questions = self.random_forced_change()
+                if success:
+                    # Test the random change
+                    score = self.try_option_for_question(changed_questions[0][0], changed_questions[0][2], exam_callback)
+                    q_idx, prev_option, new_option = changed_questions[0]
+                    self.memory[q_idx]["options"][new_option] = score
+                    if score > self.best_score:
+                        self.best_score = score
+                        self.memory[q_idx]["best_score"] = score
+                        self.memory[q_idx]["best_option"] = new_option
+                        logging.info(f"Random change improved score to {score}/{self.num_questions} 🌟")
+                        if score == self.num_questions:
+                            self.correct_answers[q_idx] = new_option
+                            logging.info(f"Q{q_idx + 1}: Confirmed correct answer {new_option} ✅")
+                    self.log_summary_report(attempt_num, changed_questions, [(q_idx, new_option)] if score <= self.best_score else [])
+                    self.save_memory()
+                if not success:
+                    logging.warning("No changes possible, stopping solver")
+                    break
 
-            temperature *= cooling_rate
             attempt_num += 1
 
-        self.fill_remaining_with_best()
-        self.export_log()
-        logging.info(f"Final answers: {self.correct_answers}")
+        # Fill remaining unknown answers with best guesses
+        for i in range(self.num_questions):
+            if self.correct_answers[i] is None:
+                self.correct_answers[i] = self.memory[i]["best_option"]
+                logging.debug(f"Q{i + 1}: Using best guess option {self.correct_answers[i]}")
+
+        logging.info(f"Final answers: {self.correct_answers}, best score: {self.best_score}/{self.num_questions}")
+        self.save_memory()
         return self.correct_answers
