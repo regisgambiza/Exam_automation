@@ -142,7 +142,7 @@ class SimpleGreedyExamSolver:
     def try_option_for_question(self, question_idx: int, option: int, exam_callback) -> int:
         """Try a specific option with robust error handling and throttling."""
         self.total_trials += 1
-        guess = self.best_answers.copy()
+        guess = [1] * self.num_questions  # Always use all 1s except for the tested question
         guess[question_idx] = option
         
         # Anti-flood throttling (progressive delay)
@@ -212,7 +212,7 @@ class SimpleGreedyExamSolver:
         improved = False
         changed_questions = []
         failed_options = []
-        baseline_score = self.best_score
+        baseline_score = self.best_score  # Fixed baseline score from initial submission
         logging.info(f"Starting systematic trial phase with baseline score: {baseline_score}/{self.num_questions}")
 
         for q_idx in range(self.num_questions):
@@ -242,11 +242,8 @@ class SimpleGreedyExamSolver:
                 if score > baseline_score:
                     # Score increased: lock this option and move to next question
                     self.correct_answers[q_idx] = option
-                    self.best_answers[q_idx] = option
                     self.memory[q_idx]["best_option"] = option
                     self.memory[q_idx]["best_score"] = score
-                    self.best_score = score
-                    baseline_score = score  # Update baseline for next question
                     improved = True
                     changed_questions.append((q_idx, 1, option))  # Option 1 was baseline
                     logging.info(f"Q{q_idx + 1}: Locked option {option} (score increased to {score}) ✅")
@@ -255,7 +252,6 @@ class SimpleGreedyExamSolver:
                 elif score < baseline_score:
                     # Score decreased: lock option 1 and move to next question
                     self.correct_answers[q_idx] = 1
-                    self.best_answers[q_idx] = 1
                     self.memory[q_idx]["best_option"] = 1
                     self.memory[q_idx]["best_score"] = baseline_score
                     failed_options.append((q_idx, option))
@@ -277,19 +273,12 @@ class SimpleGreedyExamSolver:
                 self.correct_answers[q_idx] is None):
                 last_option = 1  # Default to option 1 if all others tested
                 self.correct_answers[q_idx] = last_option
-                self.best_answers[q_idx] = last_option
                 self.memory[q_idx]["best_option"] = last_option
                 # Test option 1 to confirm score
                 score = self.try_option_for_question(q_idx, last_option, exam_callback)
                 self.memory[q_idx]["options"][last_option] = score
                 self.memory[q_idx]["best_score"] = score
-                if score > baseline_score:
-                    self.best_score = score
-                    baseline_score = score
-                    improved = True
-                    logging.info(f"Q{q_idx + 1}: Locked option 1 by elimination (score {score}) ✅")
-                else:
-                    logging.warning(f"Q{q_idx + 1}: Option 1 by elimination did not increase score ({score} <= {baseline_score})")
+                logging.info(f"Q{q_idx + 1}: Locked option 1 by elimination (score {score}) ✅")
                 changed_questions.append((q_idx, 1, last_option))
                 self.log_summary_report(attempt_num, changed_questions, failed_options)
 
@@ -297,7 +286,7 @@ class SimpleGreedyExamSolver:
             self.save_memory()
 
             # Check if perfect score achieved
-            if self.best_score == self.num_questions:
+            if baseline_score == self.num_questions:
                 logging.info("Perfect score achieved! Stopping systematic trial.")
                 break
 
@@ -365,12 +354,12 @@ class SimpleGreedyExamSolver:
         self.best_answers = [1] * self.num_questions
         for q_idx in range(self.num_questions):
             self.memory[q_idx]["best_option"] = 1
-        # Test initial answers
+        # Test initial answers to set baseline score
         try:
-            score = self.try_option_for_question(0, 1, exam_callback)
+            score = self.try_option_for_question(0, 1, exam_callback)  # Uses all 1s
             if score > 0:
                 self.memory[0]["options"][1] = score
-                self.best_score = score
+                self.best_score = score  # Set baseline score, not updated later
                 logging.info(f"Initial answers (all option 1) score: {score}/{self.num_questions}")
                 self.log_summary_report(1, [], [])  # Log initial summary
             else:

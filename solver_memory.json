@@ -1,5 +1,5 @@
 {
-  "best_score": 7,
+  "best_score": 6,
   "best_answers": [
     1,
     1,
@@ -28,7 +28,7 @@
     1,
     1,
     1,
-    4,
+    1,
     1,
     1
   ],
@@ -62,7 +62,7 @@
     3,
     4,
     1,
-    null
+    3
   ],
   "memory": {
     "0": {
@@ -75,97 +75,97 @@
     },
     "1": {
       "options": {
-        "2": 8
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 8
+      "best_score": 7
     },
     "2": {
       "options": {
-        "2": 8,
-        "3": 9
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 9
+      "best_score": 7
     },
     "3": {
       "options": {
-        "2": 8
+        "2": 5
       },
       "best_option": 1,
-      "best_score": 9
+      "best_score": 6
     },
     "4": {
       "options": {
-        "2": 8
+        "2": 5
       },
       "best_option": 1,
-      "best_score": 9
+      "best_score": 6
     },
     "5": {
       "options": {
-        "2": 10
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 10
+      "best_score": 7
     },
     "6": {
       "options": {
-        "2": 11
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 11
+      "best_score": 7
     },
     "7": {
       "options": {
-        "2": 12
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 12
+      "best_score": 7
     },
     "8": {
       "options": {
-        "2": 11
+        "2": 5
       },
       "best_option": 1,
-      "best_score": 12
+      "best_score": 6
     },
     "9": {
       "options": {
-        "2": 13
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 13
+      "best_score": 7
     },
     "10": {
       "options": {
-        "2": 13,
-        "3": 14
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 14
+      "best_score": 7
     },
     "11": {
       "options": {
-        "2": 15
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 15
+      "best_score": 7
     },
     "12": {
       "options": {
-        "2": 15,
-        "3": 16
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 16
+      "best_score": 7
     },
     "13": {
       "options": {
-        "2": 17
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 17
+      "best_score": 7
     },
     "14": {
       "options": {
@@ -176,121 +176,124 @@
     },
     "15": {
       "options": {
-        "2": 7,
-        "3": 8
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 8
+      "best_score": 7
     },
     "16": {
       "options": {
-        "2": 8,
-        "3": 8,
-        "4": 9
+        "2": 6,
+        "3": 6,
+        "4": 7
       },
       "best_option": 1,
-      "best_score": 9
+      "best_score": 7
     },
     "17": {
       "options": {
-        "2": 8
+        "2": 5
       },
       "best_option": 1,
-      "best_score": 9
+      "best_score": 6
     },
     "18": {
       "options": {
-        "2": 9,
-        "3": 9,
-        "4": 10
+        "2": 6,
+        "3": 6,
+        "4": 7
       },
       "best_option": 1,
-      "best_score": 10
+      "best_score": 7
     },
     "19": {
       "options": {
-        "2": 10,
-        "3": 10,
-        "4": 11
+        "2": 6,
+        "3": 6,
+        "4": 7
       },
       "best_option": 1,
-      "best_score": 11
+      "best_score": 7
     },
     "20": {
       "options": {
-        "2": 10
+        "2": 5
       },
       "best_option": 1,
-      "best_score": 11
+      "best_score": 6
     },
     "21": {
       "options": {
-        "2": 11,
-        "3": 12
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 12
+      "best_score": 7
     },
     "22": {
       "options": {
-        "2": 13
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 13
+      "best_score": 7
     },
     "23": {
       "options": {
-        "2": 13,
-        "3": 13,
-        "4": 14
+        "2": 6,
+        "3": 6,
+        "4": 7
       },
       "best_option": 1,
-      "best_score": 14
+      "best_score": 7
     },
     "24": {
       "options": {
-        "2": 14,
-        "3": 15
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 15
+      "best_score": 7
     },
     "25": {
       "options": {
-        "2": 16
+        "2": 7
       },
       "best_option": 1,
-      "best_score": 16
+      "best_score": 7
     },
     "26": {
       "options": {
-        "2": 16,
-        "3": 17
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
-      "best_score": 17
+      "best_score": 7
     },
     "27": {
       "options": {
-        "2": 17,
-        "3": 17,
+        "2": 6,
+        "3": 6,
         "4": 7
       },
-      "best_option": 4,
+      "best_option": 1,
       "best_score": 7
     },
     "28": {
       "options": {
-        "2": 6
+        "2": 5
+      },
+      "best_option": 1,
+      "best_score": 6
+    },
+    "29": {
+      "options": {
+        "2": 6,
+        "3": 7
       },
       "best_option": 1,
       "best_score": 7
-    },
-    "29": {
-      "options": {},
-      "best_option": 1,
-      "best_score": 0
     }
   },
-  "total_trials": 79
+  "total_trials": 50
 }
