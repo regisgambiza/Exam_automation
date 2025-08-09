@@ -11,9 +11,14 @@ import re
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def extract_from_page(page):
-    """Extract question and choices from the page."""
+    """Extract question and choices from the page with error detection."""
     logging.debug("Extracting question and choices from page")
     try:
+        # Check for exam errors before extraction
+        if "error" in page.title().lower() or "too many" in page.title().lower():
+            logging.error("Error page detected during extraction")
+            return None, []
+        
         q_p = page.locator("div.container.app div.question p")
         q_p.first.wait_for(state="visible", timeout=5000)
         question_text = "\n".join(q_p.all_inner_texts())
@@ -29,14 +34,15 @@ class SimpleGreedyExamSolver:
         self.num_questions = num_questions
         self.num_options = num_options
         self.best_score = 0
-        self.best_answers = [1] * num_questions  # Current best answers
-        self.correct_answers = [None] * num_questions  # Confirmed correct answers
-        self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(num_questions)}  # Per-question memory
+        self.best_answers = [1] * num_questions
+        self.correct_answers = [None] * num_questions
+        self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(num_questions)}
         self.questions_file = "questions_database.json"
         self.memory_file = "solver_memory.json"
-        self.attempts = []  # Store attempt history
+        self.attempts = [] 
         self.start_time = time.time()
-        self.load_memory()  # Load saved memory if available
+        self.total_trials = 0  # Track total attempts for throttling
+        self.load_memory()
         logging.debug(f"Initialized solver: {num_questions} questions, {num_options} options")
 
     def save_memory(self):
@@ -47,7 +53,8 @@ class SimpleGreedyExamSolver:
             "correct_answers": self.correct_answers,
             "memory": {str(k): {"options": {str(opt): score for opt, score in v["options"].items()},
                                "best_option": v["best_option"], "best_score": v["best_score"]}
-                       for k, v in self.memory.items()}
+                       for k, v in self.memory.items()},
+            "total_trials": self.total_trials
         }
         try:
             with open(self.memory_file, "w") as f:
@@ -57,7 +64,7 @@ class SimpleGreedyExamSolver:
             logging.error(f"Failed to save memory: {e}")
 
     def load_memory(self):
-        """Load memory and progress from disk if available and not empty."""
+        """Load memory and progress from disk with anti-plateau measures."""
         if os.path.exists(self.memory_file) and os.path.getsize(self.memory_file) > 0:
             try:
                 with open(self.memory_file, "r") as f:
@@ -72,18 +79,32 @@ class SimpleGreedyExamSolver:
                         "best_score": v["best_score"]
                     } for k, v in progress.get("memory", {}).items()
                 }
+                self.total_trials = progress.get("total_trials", 0)
+                
+                # Anti-plateau measure: Clear memory if stuck at high score
+                if self.best_score >= 17:
+                    logging.info("Clearing memory post-17 score to prevent plateau")
+                    for i in range(self.num_questions):
+                        if self.correct_answers[i] is None:
+                            self.memory[i] = {"options": {}, "best_option": 1, "best_score": 0}
+                
                 confirmed_count = sum(1 for ans in self.correct_answers if ans is not None)
                 logging.info(f"Loaded memory: best_score={self.best_score}, "
                              f"confirmed={confirmed_count}/{self.num_questions}")
             except Exception as e:
                 logging.error(f"Failed to load memory: {e}")
-                # Reset to default state on load failure
-                self.best_score = 0
-                self.best_answers = [1] * self.num_questions
-                self.correct_answers = [None] * self.num_questions
-                self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(self.num_questions)}
+                self.reset_state()
         else:
             logging.info(f"No valid {self.memory_file} found, initializing with default state")
+            self.reset_state()
+            
+    def reset_state(self):
+        """Reset solver to initial state"""
+        self.best_score = 0
+        self.best_answers = [1] * self.num_questions
+        self.correct_answers = [None] * self.num_questions
+        self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(self.num_questions)}
+        self.total_trials = 0
 
     def retrieve_questions(self, page) -> Dict:
         """Retrieve questions and options if JSON is missing or empty."""
@@ -174,20 +195,50 @@ class SimpleGreedyExamSolver:
         return answers
 
     def try_option_for_question(self, question_idx: int, option: int, exam_callback) -> int:
-        """Try a specific option for a given question and return the score."""
+        """Try a specific option with robust error handling and throttling."""
+        self.total_trials += 1
         guess = self.best_answers.copy()
         guess[question_idx] = option
-        logging.debug(f"Trying Q{question_idx + 1} with option {option}")
+        
+        # Anti-flood throttling (progressive delay)
+        delay_seconds = min(5.0, 0.5 + (0.1 * self.total_trials))
+        logging.debug(f"Delaying {delay_seconds:.1f}s before attempt #{self.total_trials}")
+        time.sleep(delay_seconds)
+        
         try:
+            logging.debug(f"Trying Q{question_idx + 1} with option {option}")
             result_text, score_text = exam_callback(guess)
-            if score_text is None or '/' not in score_text:
-                logging.warning(f"Invalid score format: {score_text} for Q{question_idx + 1}, option {option}")
+            
+            # Robust score parsing
+            if score_text is None:
+                logging.warning("No score text returned")
                 return 0
-            score = int(score_text.split('/')[0])
-            logging.debug(f"Q{question_idx + 1}, option {option} scored {score}/{self.num_questions}")
+                
+            # First try standard "X/Y" format
+            match = re.search(r'(\d+)\s*/\s*\d+', score_text)
+            if match:
+                score = int(match.group(1))
+                logging.debug(f"Standard score format detected: {score}/{self.num_questions}")
+            else:
+                # Fallback: extract first number
+                nums = re.findall(r'\d+', score_text)
+                if nums:
+                    score = int(nums[0])
+                    logging.warning(f"Non-standard score format: '{score_text}'. Using first number: {score}")
+                else:
+                    logging.error(f"Unparseable score: '{score_text}'")
+                    return 0
+            
+            # Validate score range
+            if not (0 <= score <= self.num_questions):
+                logging.warning(f"Illegal score value {score} from '{score_text}'")
+                return 0
+                
+            logging.info(f"Q{question_idx + 1}, option {option} scored {score}/{self.num_questions}")
             return score
+            
         except Exception as e:
-            logging.error(f"Error evaluating Q{question_idx + 1}, option {option}: {e}")
+            logging.error(f"Evaluation crashed for Q{question_idx+1}, option {option}: {str(e)}")
             return 0
 
     def systematic_trial_phase(self, exam_callback, attempt_num: int) -> bool:
@@ -212,36 +263,41 @@ class SimpleGreedyExamSolver:
             prev_option = self.best_answers[q_idx]
             for option in untried_options:
                 score = self.try_option_for_question(q_idx, option, exam_callback)
-                self.memory[q_idx]["options"][option] = score
-                logging.info(f"Q{q_idx + 1}, option {option}: Score={score}/{self.num_questions}")
+                
+                # Only record valid attempts (score > 0)
+                if score > 0:
+                    self.memory[q_idx]["options"][option] = score
+                    
+                    # Track changed questions
+                    if option != prev_option:
+                        changed_questions.append((q_idx, prev_option, option))
 
-                # Track changed questions
-                if option != prev_option:
-                    changed_questions.append((q_idx, prev_option, option))
+                    # Update best option for this question
+                    if score > self.memory[q_idx]["best_score"]:
+                        self.memory[q_idx]["best_score"] = score
+                        self.memory[q_idx]["best_option"] = option
+                        logging.info(f"Q{q_idx + 1}: New best option {option} with score {score} 🆕")
+                        improved = True
 
-                # Update best option for this question
-                if score > self.memory[q_idx]["best_score"]:
-                    self.memory[q_idx]["best_score"] = score
-                    self.memory[q_idx]["best_option"] = option
-                    logging.info(f"Q{q_idx + 1}: New best option {option} with score {score} 🆕")
-                    improved = True
+                    # Update global best if overall score improves
+                    if score > self.best_score:
+                        self.best_score = score
+                        self.best_answers[q_idx] = option
+                        logging.info(f"New global best score: {self.best_score}/{self.num_questions} 🌟")
+                        
+                        # Confirm correct answers if perfect score
+                        if score == self.num_questions:
+                            self.correct_answers[q_idx] = option
+                            logging.info(f"Q{q_idx + 1}: Confirmed correct answer {option} ✅")
+                            
+                        self.save_memory()
+                    elif score < self.best_score:
+                        failed_options.append((q_idx, option))
 
-                # Update global best if overall score improves
-                if score > self.best_score:
-                    self.best_score = score
-                    self.best_answers = self.best_answers.copy()
-                    self.best_answers[q_idx] = option
-                    logging.info(f"New global best score: {self.best_score}/{self.num_questions} 🌟")
-                    # Confirm correct answers for this question if score is high enough
-                    if score == self.num_questions:
-                        self.correct_answers[q_idx] = option
-                        logging.info(f"Q{q_idx + 1}: Confirmed correct answer {option} ✅")
-                    self.save_memory()
-                elif score < self.best_score:
-                    failed_options.append((q_idx, option))
-
-                # Update best answer for this question based on memory
-                self.best_answers[q_idx] = self.memory[q_idx]["best_option"]
+                    # Update best answer for this question
+                    self.best_answers[q_idx] = self.memory[q_idx]["best_option"]
+                else:
+                    logging.warning(f"Invalid score for Q{q_idx+1}, option {option} - not recorded")
 
             if self.best_score == self.num_questions:
                 logging.info("Perfect score achieved! Stopping systematic trial.")
@@ -304,7 +360,7 @@ class SimpleGreedyExamSolver:
         logging.info(f"\nFailed Answers Tried This Attempt:")
         if failed_options:
             for q_idx, option in failed_options:
-                logging.info(f"  - Q{q_idx + 1}: Option {option} rejected (score={self.memory[q_idx]['options'][option]})")
+                logging.info(f"  - Q{q_idx + 1}: Option {option} rejected (score={self.memory[q_idx]['options'].get(option, 'N/A')})")
         else:
             logging.info(f"  - No failed options this attempt")
 
@@ -313,60 +369,89 @@ class SimpleGreedyExamSolver:
         logging.info(f"  - Unknown questions left: {unknown_count}")
         logging.info(f"  - Best score so far: {self.best_score}/{self.num_questions}")
         logging.info(f"  - Elapsed time: {int(minutes)}m {int(seconds)}s")
+        logging.info(f"  - Total trials: {self.total_trials}")
         logging.info(f"============================\n")
 
     def solve(self, exam_callback, page) -> List[int]:
-        """Solve the exam using systematic trials and random changes to escape local maxima."""
+        """Solve the exam using systematic trials with plateau detection."""
         logging.info("Starting exam solver")
         self.exam_callback = exam_callback
 
         # Load questions
         questions_data = self.retrieve_questions(page)
 
-        # Initialize with AI answers only if memory is empty or no confirmed answers
-        if not any(self.correct_answers) and not any(self.memory[i]["options"] for i in range(self.num_questions)):
-            logging.info("No confirmed answers or memory, initializing with AI answers")
+        # Initialize with AI answers only if memory is empty
+        if not any(self.memory[i]["options"] for i in range(self.num_questions)):
+            logging.info("No memory found, initializing with AI answers")
             self.best_answers = self.ai_debate_answers(questions_data)
             for q_idx, option in enumerate(self.best_answers):
                 self.memory[q_idx]["best_option"] = option
             # Test initial AI answers
             score = self.try_option_for_question(0, self.best_answers[0], exam_callback)
-            self.memory[0]["options"][self.best_answers[0]] = score
-            self.best_score = score
-            logging.info(f"Initial AI answers score: {score}/{self.num_questions}")
-            self.save_memory()
+            if score > 0:
+                self.memory[0]["options"][self.best_answers[0]] = score
+                self.best_score = score
+                logging.info(f"Initial AI answers score: {score}/{self.num_questions}")
+                self.save_memory()
 
         attempt_num = 1
+        plateau_counter = 0
+        MAX_PLATEAU_ATTEMPTS = 5
+        
         while self.best_score < self.num_questions:
             if all(self.correct_answers):
                 logging.info("All answers confirmed, stopping early")
                 break
 
+            # Reset exam if stuck at plateau
+            if plateau_counter >= MAX_PLATEAU_ATTEMPTS:
+                logging.warning(f"Plateau detected at {self.best_score}/{self.num_questions} for {MAX_PLATEAU_ATTEMPTS} attempts")
+                if hasattr(exam_callback, 'reset_exam'):
+                    logging.info("Resetting exam state...")
+                    exam_callback.reset_exam()
+                    time.sleep(3)
+                    # Reload questions after reset
+                    questions_data = self.retrieve_questions(page)
+                    plateau_counter = 0
+                else:
+                    logging.warning("Reset capability not available in callback")
+
             logging.info(f"Attempt {attempt_num}: Starting systematic trial phase")
             improved = self.systematic_trial_phase(exam_callback, attempt_num)
+            
             if self.best_score == self.num_questions:
                 logging.info("Perfect score achieved!")
                 break
+
+            if improved:
+                plateau_counter = 0  # Reset plateau counter on improvement
+            else:
+                plateau_counter += 1
+                logging.info(f"No improvement this attempt (plateau counter: {plateau_counter}/{MAX_PLATEAU_ATTEMPTS})")
 
             if not improved:
                 logging.info("No improvements from systematic trials, attempting random forced change")
                 success, changed_questions = self.random_forced_change()
                 if success:
                     # Test the random change
-                    score = self.try_option_for_question(changed_questions[0][0], changed_questions[0][2], exam_callback)
                     q_idx, prev_option, new_option = changed_questions[0]
-                    self.memory[q_idx]["options"][new_option] = score
-                    if score > self.best_score:
-                        self.best_score = score
-                        self.memory[q_idx]["best_score"] = score
-                        self.memory[q_idx]["best_option"] = new_option
-                        logging.info(f"Random change improved score to {score}/{self.num_questions} 🌟")
-                        if score == self.num_questions:
-                            self.correct_answers[q_idx] = new_option
-                            logging.info(f"Q{q_idx + 1}: Confirmed correct answer {new_option} ✅")
-                    self.log_summary_report(attempt_num, changed_questions, [(q_idx, new_option)] if score <= self.best_score else [])
-                    self.save_memory()
-                if not success:
+                    score = self.try_option_for_question(q_idx, new_option, exam_callback)
+                    
+                    if score > 0:
+                        self.memory[q_idx]["options"][new_option] = score
+                        if score > self.best_score:
+                            self.best_score = score
+                            self.memory[q_idx]["best_score"] = score
+                            self.memory[q_idx]["best_option"] = new_option
+                            logging.info(f"Random change improved score to {score}/{self.num_questions} 🌟")
+                            plateau_counter = 0
+                            if score == self.num_questions:
+                                self.correct_answers[q_idx] = new_option
+                                logging.info(f"Q{q_idx + 1}: Confirmed correct answer {new_option} ✅")
+                        self.log_summary_report(attempt_num, changed_questions, 
+                                                [(q_idx, new_option)] if score <= self.best_score else [])
+                        self.save_memory()
+                else:
                     logging.warning("No changes possible, stopping solver")
                     break
 
