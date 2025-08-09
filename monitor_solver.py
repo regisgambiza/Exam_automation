@@ -2,24 +2,28 @@ import json
 import time
 import ollama
 import os
+import logging
 
 MEMORY_FILE = "solver_memory.json"
 MODEL_NAME = "llama3.1:8b"
 POLL_INTERVAL = 60  # seconds
 
+# Configure logging to match solver's format
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def load_solver_memory():
     if not os.path.exists(MEMORY_FILE):
-        print(f"[Warning] Memory file {MEMORY_FILE} not found.")
+        logging.warning(f"Memory file {MEMORY_FILE} not found.")
         return None
     try:
         with open(MEMORY_FILE, "r") as f:
             return json.load(f)
     except Exception as e:
-        print(f"[Error] Failed to load memory file: {e}")
+        logging.error(f"Failed to load memory file: {e}")
         return None
 
 def create_prompt(memory_json):
-    # We limit the memory size shown for readability (truncate if large)
+    # Truncate memory for readability (limit to 10 questions)
     truncated_memory = dict(memory_json)
     if "memory" in truncated_memory and len(truncated_memory["memory"]) > 10:
         keys = list(truncated_memory["memory"].keys())[:10]
@@ -45,31 +49,29 @@ Provide the summary in clear, concise bullet points.
 
 def main():
     last_summary = None
-    print("Starting solver memory monitor (press Ctrl+C to stop)...")
+    logging.info("Starting solver memory monitor (press Ctrl+C to stop)...")
     while True:
         memory = load_solver_memory()
         if memory:
             prompt = create_prompt(memory)
             try:
+                logging.info(f"[AI Monitor] Sending memory snapshot to {MODEL_NAME}")
                 response = ollama.chat(
                     model=MODEL_NAME,
                     messages=[{"role": "user", "content": prompt}]
                 )
                 summary = response['message']['content'].strip()
                 if summary != last_summary:
-                    print("\n--- AI Summary ---")
-                    print(summary)
-                    print("------------------")
+                    logging.info(f"[AI Monitor] AI response: {summary}")
                     last_summary = summary
                 else:
-                    print("[Info] No change in summary since last check.")
+                    logging.info("[AI Monitor] No change in summary since last check.")
             except Exception as e:
-                print(f"[Error] Ollama API call failed: {e}")
+                logging.error(f"[AI Monitor] Ollama API call failed: {e}")
         else:
-            print("[Info] No memory data to analyze.")
+            logging.info("[AI Monitor] No memory data to analyze.")
 
         time.sleep(POLL_INTERVAL)
-
 
 if __name__ == "__main__":
     main()
