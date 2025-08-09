@@ -30,6 +30,8 @@ def extract_from_page(page):
 
 class SimpleGreedyExamSolver:
     def __init__(self, num_questions: int = 30, num_options: int = 4):
+        if num_questions <= 0 or num_options <= 0:
+            raise ValueError("num_questions and num_options must be positive integers")
         self.num_questions = num_questions
         self.num_options = num_options
         self.best_score = 0
@@ -89,12 +91,12 @@ class SimpleGreedyExamSolver:
         else:
             logging.info(f"No valid {self.memory_file} found, initializing with default state")
             self.reset_state()
-            
+
     def reset_state(self):
         """Reset solver to initial state."""
         self.best_score = 0
-        self.best_answers = [1] * num_questions
-        self.correct_answers = [None] * num_questions
+        self.best_answers = [1] * self.num_questions  # Fixed: use self.num_questions
+        self.correct_answers = [None] * self.num_questions
         self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(self.num_questions)}
         self.total_trials = 0
 
