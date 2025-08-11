@@ -1,3 +1,4 @@
+
 import json
 import logging
 import random
@@ -8,6 +9,8 @@ import re
 # wagwan
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+from question_rater import run_mcq_debate
 
 def extract_from_page(page):
     """Extract question and choices from the page with error detection."""
@@ -39,10 +42,12 @@ class SimpleGreedyExamSolver:
         self.correct_answers = [None] * num_questions
         self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(num_questions)}
         self.questions_file = "questions_database.json"
+        self.ratings_file = "results_indepth.json"
         self.memory_file = "solver_memory.json"
         self.attempts = [] 
         self.start_time = time.time()
         self.total_trials = 0  # Track total attempts for throttling
+        self.ratings = []
         self.load_memory()
         logging.debug(f"Initialized solver: {num_questions} questions, {num_options} options")
 
@@ -99,6 +104,19 @@ class SimpleGreedyExamSolver:
         self.correct_answers = [None] * self.num_questions
         self.memory = {i: {"options": {}, "best_option": 1, "best_score": 0} for i in range(self.num_questions)}
         self.total_trials = 0
+
+    def load_ratings(self):
+        """Load ratings from the results_indepth.json file."""
+        if os.path.exists(self.ratings_file) and os.path.getsize(self.ratings_file) > 0:
+            try:
+                with open(self.ratings_file, "r") as f:
+                    self.ratings = json.load(f)
+                logging.info(f"Loaded ratings from {self.ratings_file}")
+            except Exception as e:
+                logging.error(f"Failed to load ratings: {e}")
+                self.ratings = []
+        else:
+            logging.info(f"No valid {self.ratings_file} found, ratings will not be used")
 
     def retrieve_questions(self, page) -> Dict:
         """Retrieve questions and options if JSON is missing or empty."""
@@ -218,20 +236,32 @@ class SimpleGreedyExamSolver:
         return 0
 
     def systematic_trial_phase(self, exam_callback, attempt_num: int) -> bool:
-        """Try options 2, 3, and 4 for each question, logging summary after each submission."""
+        """Try options in order of highest rated score for each question, logging summary after each submission."""
         improved = False
         changed_questions = []
         failed_options = []
         baseline_score = self.best_score  # Fixed baseline score from initial submission
         logging.info(f"Starting systematic trial phase with baseline score: {baseline_score}/{self.num_questions}")
 
+        option_map = {'A': 1, 'B': 2, 'C': 3, 'D': 4}
+
         for q_idx in range(self.num_questions):
             if self.correct_answers[q_idx] is not None:
                 logging.debug(f"Q{q_idx + 1} already confirmed as option {self.correct_answers[q_idx]} ✅")
                 continue
 
-            # Test options 2, 3, and 4 only
-            options_to_test = [2, 3, 4]
+            # Get ratings for this question
+            rating = next((r for r in self.ratings if r.get("question_id") == q_idx + 1), None)
+            if rating:
+                scores = rating["aggregated_scores"]
+                sorted_letters = sorted(scores, key=scores.get, reverse=True)
+                sorted_options = [option_map[letter] for letter in sorted_letters]
+                options_to_test = [opt for opt in sorted_options if opt != 1]
+            else:
+                # Fallback to original order if no ratings
+                options_to_test = [2, 3, 4]
+                logging.warning(f"No ratings found for Q{q_idx + 1}, using default order {options_to_test}")
+
             logging.info(f"Systematic trial for Q{q_idx + 1}: Testing options {options_to_test}")
 
             for option in options_to_test:
@@ -359,6 +389,18 @@ class SimpleGreedyExamSolver:
         except Exception as e:
             logging.error(f"Failed to retrieve questions: {e}")
             return self.correct_answers
+
+        # Run question rater if ratings file doesn't exist or is empty
+        if not os.path.exists(self.ratings_file) or os.path.getsize(self.ratings_file) == 0:
+            logging.info("Running question rater in debate mode")
+            try:
+                run_mcq_debate("debate", self.questions_file, self.ratings_file)
+            except Exception as e:
+                logging.error(f"Failed to run question rater: {e}")
+                # Continue without ratings
+
+        # Load ratings
+        self.load_ratings()
 
         # Initialize with option 1 for all answers
         self.best_answers = [1] * self.num_questions

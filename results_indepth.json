@@ -2,33 +2,481 @@
   {
     "question_id": 1,
     "aggregated_scores": {
-      "A": 69,
-      "B": 73.8,
-      "C": 86.2,
-      "D": 35.6
+      "A": 64.2,
+      "B": 73.2,
+      "C": 78.8,
+      "D": 53.2
     },
     "winner": {
       "choice": "C",
-      "mean_score": 86.2,
-      "consensus_sd": 4.6
+      "mean_score": 78.8,
+      "consensus_sd": 5.7
     },
     "rationales": null,
-    "round1_summary": "Option A: Mean score = 65, Rationales: Option A is not a main purpose of educational quality assurance as it focuses on student and community satisfaction rather than evaluating the effectiveness of educational management.; While community satisfaction is a positive outcome of quality education, it's not the primary focus of assurance.; Satisfaction might not be a core purpose of quality assurance; it seems more related to outcomes rather than the process.\nOption B: Mean score = 69, Rationales: Option B aligns with the principles of educational quality assurance, which emphasizes context-specific solutions for schools.; Developing context-specific management strategies aligns with ensuring educational relevance and effectiveness.; While important, management might not be the primary focus of quality assurance processes which typically emphasize standards and outcomes.\nOption C: Mean score = 82, Rationales: Option C is a key aspect of quality assurance, allowing agencies to make informed decisions based on performance data.; Accreditation and performance reporting are core functions of supervisory agencies in quality assurance.; Acknowledging performance results aligns with key aspects of educational quality assurance.\nOption D: Mean score = 40, Rationales: Option D is not typical of quality assurance practices, as they aim for continuous improvement rather than passing or failing evaluations.; Quality assurance aims to assess and improve systems, not simply label schools as 'passing' or 'failing'.; Evaluating management might indicate a focus on administrative efficiency over educational content or student learning outcomes."
+    "round1_summary": "Option A: Mean score = 66, Rationales: This is not the main purpose of educational quality assurance as it focuses on evaluating and improving the quality of education rather than creating satisfaction for the community and society.; Satisfaction for the community and society is not a core function of educational quality assurance.; While quality assurance aims to improve education for the benefit of society, satisfaction is a consequence rather than a primary purpose.\nOption B: Mean score = 68, Rationales: This is a possible main purpose of educational quality assurance as it involves developing educational management strategies that are tailored to the specific context of the school.; Educational management based on context could be part of quality assurance, but it's not the primary purpose.; Tailoring educational management to specific school contexts is a core principle of effective quality assurance.\nOption C: Mean score = 77, Rationales: This is a possible main purpose of educational quality assurance as it helps supervisory agencies to monitor and evaluate the performance results of schools under their jurisdiction.; Acknowledging performance results might align with accountability, which isn't the main aim of QA.; Accreditation and performance reporting are important functions often carried out through quality assurance systems.\nOption D: Mean score = 50, Rationales: This is not a main purpose of educational quality assurance as it focuses on evaluating whether the school's educational management passes or fails rather than on creating satisfaction for the community and society.; Evaluating school management is central to ensuring quality and effectiveness in education.; Quality assurance focuses on improvement and development, not simply passing or failing schools."
   },
   {
     "question_id": 2,
     "aggregated_scores": {
-      "A": 58,
-      "B": 58.6,
-      "C": 70.4,
-      "D": 55.6
+      "A": 66,
+      "B": 83.4,
+      "C": 86.2,
+      "D": 73.4
     },
     "winner": {
       "choice": "C",
-      "mean_score": 70.4,
-      "consensus_sd": 39.6
+      "mean_score": 86.2,
+      "consensus_sd": 4.8
     },
     "rationales": null,
-    "round1_summary": "Option A: Mean score = 77, Rationales: This option implies autonomy from external standards, which is a key aspect of an internal quality assurance system.; While schools have autonomy, a key part of quality assurance is aligning with broader educational goals and standards, not simply setting independent ones.; Setting own standards may conflict with Ministry's requirements.\nOption B: Mean score = 76, Rationales: Preparing a school development plan is often part of implementing an educational quality assurance system to set long-term goals.; School development plans are essential for outlining long-term improvement strategies, but they don't directly constitute the implementation of an internal quality assurance system.; Developing a plan is crucial for strategic direction.\nOption C: Mean score = 89, Rationales: Appointing knowledgeable individuals is crucial for establishing and maintaining a quality assurance system within the school.; Appointing dedicated individuals to oversee quality assurance is a fundamental step in establishing a robust internal system.; Expert involvement ensures effective system implementation.\nOption D: Mean score = 68, Rationales: The ability to adjust projects/activities as needed aligns with the flexibility required in implementing a dynamic quality assurance system.; Flexibility in project adjustments is important for responsiveness, but it's not a defining characteristic of a formalized quality assurance system.; Flexibility in annual plans might compromise quality assurance."
+    "round1_summary": "Option A: Mean score = 66, Rationales: This option is not part of implementing an internal educational quality assurance system within a school because it is about setting standards independently without considering the ministry's standards. An effective quality assurance system involves aligning with national and international standards.; This option suggests that schools are free to set their standards without aligning with the Ministry's, which implies a system not necessarily under external control.; While schools have autonomy, a quality assurance system should ideally align with broader educational goals and not entirely disregard Ministry standards.\nOption B: Mean score = 81, Rationales: This option is relevant to implementing an internal educational quality assurance system as it emphasizes long-term planning and improvement. A development plan provides a framework for identifying areas of strength and weakness, setting goals, and allocating resources accordingly.; Developing a plan for years ensures systematic improvement and is directly related to quality assurance.; A development plan is crucial for outlining long-term goals and strategies, integral to a comprehensive quality assurance system.\nOption C: Mean score = 84, Rationales: This option is crucial to implementing an effective internal educational quality assurance system because it ensures that the individuals responsible for the system have the necessary knowledge and competence. Knowledgeable individuals can develop and implement policies and procedures that promote quality education.; Having competent individuals responsible shows commitment to effective management and implementation of QA systems.; Appointing dedicated individuals to lead the quality assurance process ensures ownership and effective implementation.\nOption D: Mean score = 70, Rationales: This option is not directly related to implementing an internal educational quality assurance system. While adjusting activities in the annual operational plan may be part of a broader quality improvement process, it does not involve the core elements of quality assurance such as setting standards, planning, and implementation.; Flexibility in annual plans doesn't inherently exclude the principle of quality assurance, but implies possible ad hoc adjustments that may not align with comprehensive QA criteria.; Flexibility in adjusting plans based on needs and feedback is a key aspect of continuous improvement within a quality assurance system."
+  },
+  {
+    "question_id": 3,
+    "aggregated_scores": {
+      "A": 14,
+      "B": 72.6,
+      "C": 11.4,
+      "D": 57.2
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 72.6,
+      "consensus_sd": 10.5
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 20, Rationales: This option is incorrect because external quality assessment is not limited to evaluating based on the school's standards. It involves evaluating the school against national or international benchmarks.; Primarily focuses on school-specific assessments rather than external quality.; Focuses on internal school standards, not external assessment.\nOption B: Mean score = 66, Rationales: This option is partially correct as external quality assessment does involve monitoring and inspecting schools for feedback purposes, but it goes beyond just reflecting on educational management. It also considers evidence trails and adherence to central standards.; Reflects the main concept of gathering feedback for improvement through inspections and monitoring.; Closely aligns with the concept of external quality assessment as monitoring and inspection for feedback based on broader educational management.\nOption C: Mean score = 14, Rationales: This option is incorrect because building confidence among stakeholders is not the main objective of external quality assessment. Its goal is to evaluate schools against established benchmarks.; Timely but lacks focus on actual assessment methods or standards.; While stakeholder confidence is a potential outcome, it's not the core concept.\nOption D: Mean score = 52, Rationales: This option is partially correct as evaluating based on evidence trails and adhering to central standards are important aspects of external quality assessment. However, it is limited in scope and does not reflect the full range of factors considered.; Emphasizes evidence-based evaluation but doesn't highlight importance of inspection and stakeholder confidence; Highlights evidence trails and central standards which are key elements of external quality assessment."
+  },
+  {
+    "question_id": 4,
+    "aggregated_scores": {
+      "A": 63.6,
+      "B": 43.2,
+      "C": 63.2,
+      "D": 39.8
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 63.6,
+      "consensus_sd": 36.3
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 78, Rationales: This statement is partially correct because vision provides a general direction for the school to aim towards. However, it does not define the future direction completely.; Vision aligns with defining future direction for schools.; Vision often sets aspirational goals for the future and guides decision-making.\nOption B: Mean score = 46, Rationales: This statement is incorrect because a mission statement outlines the values and beliefs of a school as well as its outputs. It defines what the school aims to achieve rather than just specifying outputs.; Mission typically outlines both outputs and values.; Mission encompasses more than just outputs; it defines the purpose and values driving the school's actions.\nOption C: Mean score = 81, Rationales: This statement is partially correct because goals provide specific targets for the school to work towards. However, they are not necessarily future-oriented and can be short-term in nature.; Goals are indeed set for future achievements by educational institutions.; Goals are indeed specific, measurable targets that a school aims to achieve.\nOption D: Mean score = 54, Rationales: This statement is partially correct because identity refers to a school's unique characteristics and values. However, it does not specify what should be instilled in students upon completing each educational level.; Identity involves core characteristics instilled in students, suggesting 'must' implies certainty not aligned with typical identity description.; Identity can encompass both characteristics instilled in students and the overall ethos or culture of the school."
+  },
+  {
+    "question_id": 5,
+    "aggregated_scores": {
+      "A": 81,
+      "B": 56,
+      "C": 54,
+      "D": 83
+    },
+    "winner": {
+      "choice": "D",
+      "mean_score": 83,
+      "consensus_sd": 7.6
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 77, Rationales: A good goal should be challenging but achievable. If the goal is too difficult, it can demotivate practitioners and make them less likely to work towards it.; Easy goals are attainable and encourage motivation.; Goals should be challenging but achievable. Too difficult and practitioners may lose motivation.\nOption B: Mean score = 53, Rationales: The timeframe for implementation may not always be flexible. However, if a goal has an unrealistic deadline that cannot be met, then it may become irrelevant or even harmful.; Goals should have a clear deadline for focus.; Good goals need a defined timeframe to provide focus and urgency.\nOption C: Mean score = 57, Rationales: Creativity and innovation are important qualities of a good goal because they help to keep practitioners engaged and motivated. A goal that requires creative solutions can lead to new ways of thinking and problem-solving.; Goals that require innovation inspire growth.; While creativity can be helpful, it's not the defining characteristic of a good goal.\nOption D: Mean score = 81, Rationales: A goal should be specific but not so specific that it becomes unattainable. If the goal is too narrow, then practitioners may not have the freedom to explore different approaches or make progress.; Overly specific goals might limit creativity or adaptability.; Specificity is crucial for clear understanding and progress measurement.  However, overly specific goals can become inflexible."
+  },
+  {
+    "question_id": 6,
+    "aggregated_scores": {
+      "A": 62,
+      "B": 63,
+      "C": 49,
+      "D": 62
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 63,
+      "consensus_sd": 35.3
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 77, Rationales: While setting standards can provide clarity, it may not be the only indicator of educational management.; Setting standards offers clear guidelines but might not inherently define educational management practices.; Setting standards often leads to better tracking and measurement of educational progress.\nOption B: Mean score = 76, Rationales: Standards can guide development plans but should not be the sole factor in doing so.; Standards provide concrete steps for planning and are directly useful in development plans.; Standards can guide the creation of a school's development plan by outlining goals and benchmarks.\nOption C: Mean score = 60, Rationales: Clear policies are important but may not always be clearly defined by standards.; Defining policies is more about governance than the operational benefits of setting educational standards.; While standards inform policy, they don't directly *define* all educational policies.\nOption D: Mean score = 73, Rationales: Monitoring and evaluation are important aspects of educational operations, but standards should not be the only tool used.; Monitoring, inspection, and evaluation tools are direct outcomes of having set standards, enhancing accountability and quality.; Monitoring and evaluation are key components of using standards effectively to improve education."
+  },
+  {
+    "question_id": 7,
+    "aggregated_scores": {
+      "A": 37,
+      "B": 88,
+      "C": 65.4,
+      "D": 54.4
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 88,
+      "consensus_sd": 4.5
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 37, Rationales: Option A provides a specific language proficiency requirement that aligns with the context of Thailand's educational system. However, it is limited to one language and does not necessarily cover other aspects of education.; Measures student language proficiency but lacks alignment with school context.; This focuses on a specific skill level (75%) but doesn't necessarily reflect the school's unique context.\nOption B: Mean score = 80, Rationales: Option B is a positive aspect of schooling, but it does not directly relate to educational standards aligned with the school's context.; Promotes professional growth and community interaction which can be contextual, but not directly educational standards.; This directly addresses aligning standards with context by promoting teacher collaboration and improvement based on their specific environment.\nOption C: Mean score = 61, Rationales: Option C sets a high standard for language proficiency, but it is also limited in scope as it only covers communication at an international level and not other areas of education.; Reflects aligned educational goals as it measures comprehensive skill development including international communication.; While ambitious, this statement lacks connection to the school's particular circumstances.\nOption D: Mean score = 52, Rationales: Option D aligns well with the context of developing teachers and staff expertise, which can improve educational standards. However, it may not directly relate to specific standards set by the school.; Improves teacher capabilities indirectly contributing to standards, but lacks specific student outcome metrics.; Professional development is valuable but doesn't inherently demonstrate alignment with the school's unique context."
+  },
+  {
+    "question_id": 8,
+    "aggregated_scores": {
+      "A": 64,
+      "B": 54,
+      "C": 21,
+      "D": 20
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 64,
+      "consensus_sd": 36.0
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 72, Rationales: This answer is correct as it mentions three of the key components of quality assurance: quality assurance, quality inspection, and quality evaluation. These are all important aspects of ensuring educational quality.; Comprehensive view of QA components, including planning and evaluation.; This option directly addresses the core components of a quality assurance system: assessing, inspecting, and evaluating educational quality.\nOption B: Mean score = 70, Rationales: This answer is also correct but less specific than A. It mentions quality development, monitoring and inspection, and quality evaluation, which are all related to quality assurance, but not as explicitly as in option A.; Incorporates development and monitoring which is part of a quality system.; While monitoring and evaluation are part of quality assurance, 'quality development' is more focused on improvement strategies rather than the system itself.\nOption C: Mean score = 28, Rationales: While data and information gathering and operational reporting are important aspects of quality assurance, they are not specifically mentioned in the question. Therefore, this answer is less likely than the other options.; Primarily focuses on data collection and summarization, lacking proactive elements like quality development.; These activities are related to operational management and data analysis, not specifically the framework of quality assurance.\nOption D: Mean score = 40, Rationales: This answer is incorrect because it does not mention any of the specific components of quality assurance that were listed in the question. Therefore, this option is least likely.; Emphasizes personnel roles but lacks the strategic and evaluative aspects typically included in QA systems.; This focuses on administrative tasks and reporting, lacking the core elements of assessment and evaluation in a quality assurance system."
+  },
+  {
+    "question_id": 9,
+    "aggregated_scores": {
+      "A": 57.6,
+      "B": 49.2,
+      "C": 88.2,
+      "D": 56.4
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 88.2,
+      "consensus_sd": 2.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 68, Rationales: This option does not mention any specific standard or process related to school administration and management. Therefore, it has a low score.; Developing academic programs aligns with strategic planning and curriculum development which are core aspects of school administration.; While important, this is more focused on curriculum development than broad school administration.\nOption B: Mean score = 56, Rationales: While technology can enhance learning, it is not a standard in the area of school administration and management processes. Thus, this option also has a low score.; While using technology for learning is important, it does not encapsulate the entire scope of school administrative processes.; Technology integration is important but not the defining standard of school administration.\nOption C: Mean score = 84, Rationales: Assessment and evaluation are important components of student learning and development, which makes this option relevant to school administration and management processes. Therefore, it has a higher score than the other options.; Systematic assessment and evaluation are fundamental components in educational management ensuring quality education standards.; Systematic assessment and evaluation are fundamental to effective school management and improvement.\nOption D: Mean score = 50, Rationales: Managing classrooms effectively is crucial for student success, but it is not a standard in itself. This option also has a low score.; Managing classrooms positively pertains to teaching methods rather than overarching school administration; Classroom management is crucial, but it's a specific aspect within broader administrative functions."
+  },
+  {
+    "question_id": 10,
+    "aggregated_scores": {
+      "A": 43,
+      "B": 9,
+      "C": 23,
+      "D": 80
+    },
+    "winner": {
+      "choice": "D",
+      "mean_score": 80,
+      "consensus_sd": 3.5
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 43, Rationales: This option is partially correct as Lesson Study (LS) can be considered a teaching technique or instructional method. However, it is not the only understanding of LS among teachers.; Technique or method can be too narrow and ignores the collaborative aspect of Lesson Study.; Lesson Study is not primarily a single teaching technique but a collaborative process.\nOption B: Mean score = 10.4, Rationales: This option is incorrect as Lesson Study does not satisfy teachers like a new form of teacher evaluation process.; Satisfaction for teachers might not fully capture the collaborative learning and professional growth dimension.; LS focuses on improvement and collaboration, not evaluation.\nOption C: Mean score = 19, Rationales: This option is partially correct as Lesson Study can help teachers produce many complete lesson plans. However, it is not the only understanding of LS among teachers.; Producing lesson plans is part of Lesson Study, but it focuses more on collaboratively improving teaching practices.; While LS may result in lesson plans, its focus is broader than simply plan creation.\nOption D: Mean score = 78, Rationales: This option is mostly correct as Lesson Study involves teachers collaborating with professional peers to jointly plan learning management.; This accurately represents Lesson Study as a collaborative process to enhance teaching and learning.; This accurately reflects the collaborative nature of Lesson Study centered around planning and improving learning management."
+  },
+  {
+    "question_id": 11,
+    "aggregated_scores": {
+      "A": 73,
+      "B": 59,
+      "C": 78,
+      "D": 39
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 78,
+      "consensus_sd": 3.5
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 68, Rationales: Teacher Koi's dedication and commitment to creating learner-centered lesson plans is highly valuable for classroom quality assurance and design. This approach ensures that every student receives the attention they need to succeed.; Describes teacher's effort in lesson planning but lacks aspects of quality assurance and design.; Focuses on individual teacher effort, not a systematic approach to classroom quality.\nOption B: Mean score = 64, Rationales: While teacher Kai's effort in teaching is commendable, their focus solely on checking students' work does not fully capture the essence of quality assurance and design. It may lead to a lack of engagement and creativity among students.; Focuses on individual student feedback which is part of quality control but doesn't encompass comprehensive classroom design.; Highlights individual student feedback, which can be part of QA but doesn't encompass the whole picture.\nOption C: Mean score = 67, Rationales: Teacher King's approach to analyzing student behavior and adjusting learning plans accordingly demonstrates some level of quality assurance, but it lacks the focus on student-centered design that is crucial for creating effective classrooms.; Strongly aligns with quality assurance through monitoring, analysis, and adjustments to learning plans.; Emphasizes data-driven adjustments and individualized learning plans, aligning with QA principles.\nOption D: Mean score = 41, Rationales: Teacher Kaew's decision to group students voluntarily for easier teaching management may help manage workload, but it does not address the critical aspects of quality assurance and design. It could also lead to inequities among students.; Emphasizes ease of teaching management rather than systematic quality assurance or pedagogical design.; Primarily about grouping efficiency, not directly related to classroom quality assurance and design."
+  },
+  {
+    "question_id": 12,
+    "aggregated_scores": {
+      "A": 50,
+      "B": 89.8,
+      "C": 17.6,
+      "D": 10.2
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 89.8,
+      "consensus_sd": 3.9
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 60, Rationales: Teachers using the Lesson Study process are trying to improve their ability to plan and teach effective lessons that promote student understanding.; Explains the process as a means to develop effective lesson plans.; While Lesson Study involves lesson planning, the focus is more on collaborative analysis and refinement through practice.\nOption B: Mean score = 86, Rationales: The Lesson Study process emphasizes collaboration among teachers to study teaching content in order to better understand students' learning needs and improve instructional practices.; Describes Lesson Study accurately as collaborative teacher improvement.; This accurately describes the core of Lesson Study: teachers working together to deeply understand content and how students learn it.\nOption C: Mean score = 19, Rationales: This answer is incorrect as the Lesson Study process does not have a focus on teacher professional development or career advancement.; Lacks context on how it contributes to professional development.; Though professional development is a result, it's not the primary goal. Lesson Study centers on improving teaching practices.\nOption D: Mean score = 15, Rationales: This answer is incorrect as the Lesson Study process does not involve occasional teaching sessions but rather an in-depth study of teaching content.; Misrepresents Lesson Study focusing only on occasional sessions, not continuous improvement.; Lesson Study is ongoing and iterative, not just occasional sessions."
+  },
+  {
+    "question_id": 13,
+    "aggregated_scores": {
+      "A": 55.4,
+      "B": 66.8,
+      "C": 79.4,
+      "D": 40.4
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 79.4,
+      "consensus_sd": 6.2
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 67, Rationales: This is an objective of classroom observation by a Buddy Teacher (BT). The BT observes to check whether all students are learning.; Objective may not align with the concept of Buddy Teacher observation.; While observing student engagement is important, checking if *all* students are learning is subjective and difficult to assess definitively during a single observation.\nOption B: Mean score = 62, Rationales: This is not an objective of classroom observation by a Buddy Teacher (BT). The BT does not observe the teacher's actions when a student is not learning.; BT intervention focus is on teacher behavior, not student outcomes.; Observing teacher responses to struggling students is a key objective of BTs, as it reveals their instructional strategies and support systems.\nOption C: Mean score = 76, Rationales: This is an objective of classroom observation by a Buddy Teacher (BT). The BT observes to determine how the teacher knows that all students are learning.; Duplicate option D and focuses on teacher's method instead of its effectiveness.; Understanding how the teacher gauges student learning is crucial for providing feedback and identifying areas for growth.\nOption D: Mean score = 57, Rationales: This is an objective of classroom observation by a Buddy Teacher (BT). The BT observes to determine how the teacher knows that all students are learning.; Describes an objective commonly associated with classroom observation by a BT.; This option is a duplicate of C."
+  },
+  {
+    "question_id": 14,
+    "aggregated_scores": {
+      "A": 57,
+      "B": 77,
+      "C": 39,
+      "D": 73
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 77,
+      "consensus_sd": 6.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 55, Rationales: This option mentions all groups which could be involved in preparing a self-assessment report. However, it does not specify who is responsible for the task.; Involves all stakeholders for comprehensive feedback.; While all stakeholders contribute to school improvement, a comprehensive self-assessment report typically requires structured input from specific groups.\nOption B: Mean score = 70, Rationales: This option specifies that the school committee and all school staff are involved in preparing the self-assessment report. Administrators and teachers are likely to have more responsibility for this task.; Reflects formal decision-making bodies and staff involvement.; School committees often oversee self-assessment processes, involving administrators, teachers, and staff to gather data and insights for the report.\nOption C: Mean score = 42, Rationales: This option mentions a supervisory agency and the parents' association, which are unlikely to be involved in preparing the self-assessment report. It also specifies that administrators, teachers, and school staff are involved.; Lacks detail on specific roles or responsibilities.; Supervisory agencies and parent associations may provide feedback but are not usually responsible for drafting the primary self-assessment report.\nOption D: Mean score = 73, Rationales: This option specifies that the school management committee, administrators, teachers, and parents are all involved in preparing the self-assessment report. This seems to be a comprehensive list of those who could be involved.; Clear focus on key leadership bodies with broad participation.; A school management committee can play a role in overseeing the process, but including parents as the primary contributors to the report is less common."
+  },
+  {
+    "question_id": 15,
+    "aggregated_scores": {
+      "A": 78,
+      "B": 51.2,
+      "C": 64.4,
+      "D": 39
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 78,
+      "consensus_sd": 9.1
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 66, Rationales: This option would likely score high because it focuses on creating a positive school environment and improving the educational experience for students. The TOWS Matrix suggests that organizations should focus on improving their internal processes when dealing with external issues.; Developing context-specific resources aligns well with school needs.; The TOWS Matrix focuses on aligning internal strengths and weaknesses with external opportunities and threats. Option A directly addresses the school's context (internal) and potential learning resources (external).\nOption B: Mean score = 52, Rationales: This option may score lower because it does not directly address the issue at hand. While cooperation with the community is important, it does not address how to improve the quality of education within the school.; Improving management efficiency is crucial for resource allocation but less directly impacts student learning.; While management efficiency is important, it doesn't explicitly connect to the core purpose of a school as defined by the TOWS Matrix.\nOption C: Mean score = 57, Rationales: This option would likely score high because it addresses the internal processes of the school and focuses on improving the educational experience for students. The TOWS Matrix suggests that organizations should focus on improving their internal processes when dealing with external issues.; Student-centered education enhances learning outcomes and engagement.; Student-centered learning is valuable but not necessarily a strategic issue directly derived from a TOWS Matrix analysis.\nOption D: Mean score = 47, Rationales: This option may score lower because it does not directly address the issue at hand. While instilling desirable values and characteristics in students is important, it does not address how to improve the quality of education within the school.; Values instillation is important, but not immediately related to strategic planning through the TOWS Matrix.; Instilling values is a school's mission but less tied to specific opportunities and threats identified through the TOWS Matrix."
+  },
+  {
+    "question_id": 16,
+    "aggregated_scores": {
+      "A": 27,
+      "B": 25,
+      "C": 80,
+      "D": 34
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 80,
+      "consensus_sd": 0.0
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 42, Rationales: This option does not align with an aggressive (SO) strategy as it focuses on promoting students' health rather than pursuing competitive advantages.; Promoting health indirectly supports the school but does not aggressively target a core strength.; Promotes health but doesn't directly leverage existing strengths for growth.\nOption B: Mean score = 27, Rationales: While developing analytical thinking skills is important, it may not be the best choice for an aggressive (SO) strategy as it doesn't directly address gaining a competitive edge.; Developing analytical skills is strong internally but does not necessarily exploit external opportunities.; Important but not a direct exploitation of school strengths.\nOption C: Mean score = 70.6, Rationales: Improving teaching and learning activities using diverse methods and community learning resources could potentially align with an aggressive (SO) strategy if it involves implementing innovative practices that differentiate the school from its competitors.; Improving teaching with community resources actively leverages both internal strengths and external opportunities for aggressive strategy.; Leverages community resources and diverse methods, aligning with the 'O' (Opportunities) and 'S' (Strengths).\nOption D: Mean score = 43.4, Rationales: Fostering close cooperation between home and school is important for student success, but it doesn't directly contribute to gaining a competitive advantage in an aggressive (SO) strategy.; Fostering cooperation between home and school is an internal focus, not targeting external opportunities or strengths.; Focuses on home-school connection which is valuable but not an aggressive SO strategy."
+  },
+  {
+    "question_id": 17,
+    "aggregated_scores": {
+      "A": 75.2,
+      "B": 83.4,
+      "C": 75.2,
+      "D": 39
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 83.4,
+      "consensus_sd": 5.2
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 75, Rationales: Learner-centered learning emphasizes the learner's needs and interests, fostering a self-directed approach. It prioritizes active engagement and collaboration in the learning process.; Learner-centered emphasizes student involvement and self-discovery; Learner-centered learning emphasizes student needs and goals, but doesn't always focus on hands-on practice.\nOption B: Mean score = 81, Rationales: Similar to learner-centered learning, student-centered learning focuses on individual students' unique abilities and learning styles, promoting tailored instruction.; Student-centered is similar to learner-centered, focusing on students' needs and experiences; Student-centered learning directly aligns with the described approach of active participation and self-summarization.\nOption C: Mean score = 81, Rationales: Active learning for competency development involves learners actively engaging with content, demonstrating mastery through performance tasks, and developing problem-solving skills.; Active learning focuses on practical application of knowledge for skill development; While accurate, it's a more specific term than the broader description provided.\nOption D: Mean score = 41, Rationales: Knowledge transfer-based learning focuses on the teacher's delivery of information to students. While it may include hands-on activities, its main objective is the transfer of knowledge from the teacher to the student.; Knowledge transfer-based typically involves teaching skills through demonstration and practice; This approach focuses on transferring existing knowledge, not actively building it through practice."
+  },
+  {
+    "question_id": 18,
+    "aggregated_scores": {
+      "A": 31.6,
+      "B": 80.4,
+      "C": 40.2,
+      "D": 32.4
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 80.4,
+      "consensus_sd": 5.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 38, Rationales: Defining assessment approaches is important to ensure that the lessons are aligned with specific goals and objectives. It also helps in determining how to measure student progress.; Assessment approaches are too late in sequence considering the goal of designing meaningful lesson plans.; Assessment is important but should follow clear objectives and content.\nOption B: Mean score = 76, Rationales: Identifying learning objectives guides activity design by ensuring that all activities are aligned with specific learning outcomes. This promotes a more purposeful approach to teaching.; Setting clear learning objectives is foundational for guiding all subsequent activity design.; Learning objectives drive the entire lesson plan, guiding activity selection and assessment.\nOption C: Mean score = 33, Rationales: Defining content or concepts is crucial as it sets the foundation for the lesson plan. Without clear and concise content, students may struggle to understand the material being taught.; Defining content alone lacks context on how this aligns with learning goals or student needs.; Content is crucial but needs to be framed within learning objectives and assessed for understanding.\nOption D: Mean score = 34, Rationales: Organizing learning activities to maximize student participation is important but should not be prioritized over other aspects of lesson planning.; Important, but should follow identifying learning objectives to ensure activities are purposeful and effective.; While participation is valuable, it shouldn't precede defining learning goals and content."
+  },
+  {
+    "question_id": 19,
+    "aggregated_scores": {
+      "A": 87,
+      "B": 89.6,
+      "C": 43,
+      "D": 75.8
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 89.6,
+      "consensus_sd": 3.6
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 82, Rationales: The constructivist theory suggests that learners build their knowledge through experiences and interactions. Therefore, activities that link new experiences to prior experiences can facilitate meaningful learning.; Constructivist theory aligns well with meaningful learning as it involves linking new experiences to prior knowledge.; Constructivism emphasizes linking new information to existing knowledge for deeper understanding.\nOption B: Mean score = 83, Rationales: Understanding concepts is a crucial aspect of meaningful learning. Activities that help students understand concepts rather than just memorize facts can lead to better retention and application of knowledge.; Focus on understanding concepts promotes deeper and more significant learning compared to mere memorization.; Understanding concepts over memorization is a key goal of quality learning.\nOption C: Mean score = 43, Rationales: Engaging students in fun, lively, and exciting experiences can increase motivation and enjoyment of learning. However, this may not necessarily result in meaningful learning if the activities are not linked to prior knowledge or understanding of concepts.; While engaging activities are beneficial, they may not necessarily lead to meaningful or deep learning.; While engaging activities are important, they don't guarantee meaningful learning.\nOption D: Mean score = 90, Rationales: Both A and B are important characteristics of a quality lesson plan. Activities that link new experiences to prior experiences according to constructivist theory can facilitate meaningful learning, while activities that help students understand concepts rather than just memorize facts can lead to better retention and application of knowledge.; Option A addresses a foundational aspect of constructivist theory while option B focuses on the ultimate goal of learning which is understanding rather than just facts.; Both A and B directly address the characteristics of a quality lesson plan that enables meaningful learning."
+  },
+  {
+    "question_id": 20,
+    "aggregated_scores": {
+      "A": 86.4,
+      "B": 37.6,
+      "C": 71.2,
+      "D": 30.8
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 86.4,
+      "consensus_sd": 2.2
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 76, Rationales: Co-operative theory and construction theory emphasize strong students helping weaker ones, which is a key feature of co-5STEPs teaching. This aligns well with the learning theories underlying this instructional approach.; Co-5STEPs promotes collaborative learning which aligns with co-operative theory and constructionist approaches that value collective knowledge creation.; While cooperative learning is central to Co-5STEPs, Construction theory doesn't directly address peer support.\nOption B: Mean score = 44, Rationales: While progressivism and construction theory share some similarities with co-5STEPs teaching, they do not specifically emphasize strong students helping weaker ones. Therefore, option B has a lower confidence score.; Progressivism does not necessarily support peer teaching as a core principle.; Progressivism focuses on active learning and experience, but doesn't explicitly highlight peer tutoring.\nOption C: Mean score = 73, Rationales: Constructionism and constructivism are both learning theories that emphasize student involvement in the learning process. While these theories share some similarities with co-5STEPs teaching, they do not specifically emphasize strong students helping weaker ones. Therefore, option C has a lower confidence score.; Constructionism and constructivism focus on active learning but may not specifically emphasize student-to-student assistance beyond individual development.; Constructionism and Constructivism both emphasize learners actively building knowledge, often through social interaction.\nOption D: Mean score = 37, Rationales: Social constructive theory and theory of construction are both learning theories that focus on the social construction of knowledge and understanding. While these theories share some similarities with co-5STEPs teaching, they do not specifically emphasize strong students helping weaker ones. Therefore, option D has a lower confidence score.; Social Constructive theory is redundant with Social Constructivism, which might slightly align but doesn't directly correlate with peer teaching's emphasis.; Theory of Construction is less established and doesn't have the same prominence as Social Constructive theory."
+  },
+  {
+    "question_id": 21,
+    "aggregated_scores": {
+      "A": 64,
+      "B": 91.4,
+      "C": 84,
+      "D": 26.6
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 91.4,
+      "consensus_sd": 3.5
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 65, Rationales: This statement is incorrect because purposeful operations are not a specific characteristic of universal educational quality assurance. Instead, quality assurance typically involves ongoing monitoring and evaluation of educational practices to ensure they meet certain standards.; Emphasizes purposeful operations can contribute to educational improvement.; While emphasis on purposeful operations is important in education, it's not the defining characteristic of universal quality assurance.\nOption B: Mean score = 87, Rationales: This statement is correct because empirical data are a crucial component of continuous quality improvement in education. By collecting and analyzing data, educators can identify areas for improvement and develop strategies to enhance student outcomes.; Uses empirical data for continuous improvement is common and logical.; Empirical data and continuous improvement are core principles of quality assurance systems globally.\nOption C: Mean score = 84, Rationales: While developing quality from a systemic and holistic perspective is important, it is not specific to universal educational quality assurance. Quality assurance systems can take many different forms depending on the context in which they are applied.; Developing quality from a holistic perspective aligns with comprehensive educational practices.; Universal quality assurance aims for a holistic approach, considering all aspects of education.\nOption D: Mean score = 26, Rationales: This statement is partially correct but not entirely accurate. While some form of quality assurance may be implemented worldwide, there is no universally accepted system or standard for measuring and improving educational quality.; Uniformly applied worldwide suggests overlooking regional differences in education, which may not be practical.; Universal application is aspirational but challenging due to diverse educational contexts worldwide."
+  },
+  {
+    "question_id": 22,
+    "aggregated_scores": {
+      "A": 72.6,
+      "B": 71.6,
+      "C": 53,
+      "D": 64
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 72.6,
+      "consensus_sd": 40.8
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 93, Rationales: While specificity is important in goal setting, the definition of specific isn't necessarily precise or clear. This statement is mostly correct.; S specificity directly correlates with effective goal setting.; S.M.A.R.T goals are known for being specific and clearly defined.\nOption B: Mean score = 93, Rationales: Measurable goals are essential for tracking progress and determining success, which makes this statement incorrect.; M measurability is essential for tracking progress.; Measurability is a key component of S.M.A.R.T. goals, allowing for progress tracking.\nOption C: Mean score = 65, Rationales: Reasonable goals are crucial to ensure they can be achieved. However, the wording of 'reasonable' may vary depending on individuals, making this statement somewhat subjective.; R rationality doesn't define a critical aspect of S.M.A.R.T. goals.; While goals should be challenging, the emphasis is on 'achievable' rather than solely 'reasonable'.\nOption D: Mean score = 77, Rationales: Setting goals with a specific timeframe helps maintain motivation and accountability. While timely goals are important, the wording of 'definite' might not accurately reflect the requirement for a specific timeframe.; T timeliness ensures goals are time-bound and achievable.; Timeframes are crucial for S.M.A.R.T. goals to provide a sense of urgency and accountability."
+  },
+  {
+    "question_id": 23,
+    "aggregated_scores": {
+      "A": 92.4,
+      "B": 24.2,
+      "C": 9,
+      "D": 3.8
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 92.4,
+      "consensus_sd": 3.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 87.4, Rationales: The first step in strategic planning is to analyze the school's strengths, weaknesses, opportunities, and threats. This information can be used to identify problems, obstacles, and needs that need to be addressed in order to develop an effective plan.; This is a common step in strategic planning as it identifies the school's strengths, weaknesses, opportunities, and threats.; SWOT and TOWS analyses are fundamental for understanding internal strengths/weaknesses and external opportunities/threats, a core part of strategic planning.\nOption B: Mean score = 18, Rationales: While preparing the annual operational plan is important, it comes after the initial analysis has been completed. The annual plan focuses on how resources will be allocated to achieve specific goals and objectives, whereas strategic planning involves defining long-term goals and identifying the necessary steps to achieve them.; The annual operational plan comes after strategy development, not before.; An operational plan is more tactical and focused on day-to-day activities, not the overarching strategy.\nOption C: Mean score = 11, Rationales: Implementing the plan is an important step, but it should not occur until all other steps have been completed. Without a clear plan in place, it is difficult to determine how resources should be allocated and what specific actions need to be taken to achieve goals.; Implementation follows after strategy has been developed, making this an incorrect first step.; Implementation comes after defining the strategic goals and plans.\nOption D: Mean score = 7.2, Rationales: Monitoring and inspecting operations is also an important part of strategic planning, but it comes after the initial analysis has been completed. This step involves evaluating how well the plan is being executed and identifying areas where adjustments may need to be made.; Monitoring operations does not constitute a strategic planning start; it is part of the execution phase.; Monitoring and inspecting are ongoing processes throughout the cycle, not the initial step."
+  },
+  {
+    "question_id": 24,
+    "aggregated_scores": {
+      "A": 64,
+      "B": 34,
+      "C": 62,
+      "D": 44
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 64,
+      "consensus_sd": 36.0
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 76, Rationales: Quality inspections should be conducted on a regular basis, covering all aspects of school operations to ensure continuous improvement. The statement suggests that inspections are only conducted once per activity which may not provide a comprehensive picture.; Comprehensive monitoring aligns with educational best practices.; While inspections can cover various aspects, it's unlikely they encompass *every single activity* a school undertakes.\nOption B: Mean score = 52, Rationales: Monitoring and inspection should take place throughout the year, as goals and objectives can change over time. It is important to track progress and make adjustments as necessary.; Post-operations inspection lacks preventative measures against quality issues.; Monitoring and inspection should be ongoing processes to identify areas for improvement and provide timely feedback, not just at the end of operations.\nOption C: Mean score = 73, Rationales: An appointed committee may not be the most effective way to conduct monitoring and inspection. The involvement of teachers and staff in this process would provide valuable insight into classroom operations and could lead to more effective inspections.; Committees facilitate structured and unbiased evaluations.; Forming a dedicated committee for monitoring and inspection is a common practice to ensure objectivity and thoroughness.\nOption D: Mean score = 49, Rationales: While it is important for teachers and staff to inspect their own performance, this should not be the only method of quality control. Ongoing monitoring by outside sources is necessary to ensure that goals are being met and to identify areas for improvement.; Self-inspection might lack external perspective and thoroughness.; Self-evaluation by teachers and staff is important but shouldn't solely replace external monitoring and inspection for comprehensive quality assessment."
+  },
+  {
+    "question_id": 25,
+    "aggregated_scores": {
+      "A": 71.6,
+      "B": 85.2,
+      "C": 68.2,
+      "D": 63.8
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 85.2,
+      "consensus_sd": 3.6
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 68, Rationales: This statement is partially incorrect because SWOT analysis is used to identify an organization's internal and external strengths, weaknesses, opportunities, and threats. It does not determine the future direction of the organization.; SWOT analysis focuses on organization's strengths, weaknesses, opportunities and threats, not future direction.; SWOT analysis focuses on identifying internal strengths and weaknesses and external opportunities and threats to inform strategy, not solely determine future direction.\nOption B: Mean score = 85, Rationales: This statement is partially correct as vision refers to a broad and inspiring description of an organization's desired state. However, it is not specific enough to indicate what the organization needs to achieve to reach that state.; Vision is widely recognized as a broad future image of the desired state.; Vision statements typically articulate a broad, aspirational picture of the desired future state.\nOption C: Mean score = 59, Rationales: This statement is partially correct as mission defines the roles and functions of an organization. However, it does not specify whether these roles and functions will change in the future to align with new goals or objectives.; Mission describes what an entity does to achieve its vision; it doesn't define roles and functions but states why the entity exists.; Mission statements outline an organization's purpose and how it intends to achieve its vision, emphasizing roles, functions, and actions.\nOption D: Mean score = 54, Rationales: This statement is incorrect as target indicators are specific measurements that organizations use to evaluate their progress towards achieving their educational development strategies. They do not need to be specified.; Educational development strategies naturally include target indicators for improvement.; Educational development strategies should include target indicators for measuring progress and effectiveness."
+  },
+  {
+    "question_id": 26,
+    "aggregated_scores": {
+      "A": 92,
+      "B": 14,
+      "C": 32.4,
+      "D": 21
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 92,
+      "consensus_sd": 2.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 85.6, Rationales: This answer is the most comprehensive and considers multiple aspects of quality assurance. It highlights the improvement in confidence from all sectors and the delivery of quality education.; Quality assurance leads to continuous improvement and trust in educational quality.; Quality assurance inherently focuses on continuous improvement and building trust through demonstrable quality.\nOption B: Mean score = 20.4, Rationales: While administrators' evaluations may improve, this doesn't directly address the school's overall quality or educational outcomes.; Performance evaluations may improve but are not the primary benefit for schools.; While administrators might benefit from a positive school environment, it's not the primary goal of quality assurance.\nOption C: Mean score = 37, Rationales: National learning outcomes provide valuable information about a school's performance but don't necessarily reflect its strengths in other areas such as leadership and innovation.; Achieving national outcomes is a result of quality assurance, not its main benefit.; National learning outcomes are a potential outcome, but quality assurance is about the processes that lead to better education, not just results.\nOption D: Mean score = 25, Rationales: Becoming more competitive with other schools may not always lead to increased enrollment or improved educational outcomes.; Competitiveness can be an outcome of quality improvement, but it's secondary to direct benefits like quality and trust.; Competition can be a byproduct, but the core focus of quality assurance is on providing excellent education, not outperforming others."
+  },
+  {
+    "question_id": 27,
+    "aggregated_scores": {
+      "A": 83,
+      "B": 25,
+      "C": 65.4,
+      "D": 40
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 83,
+      "consensus_sd": 2.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 78, Rationales: This answer is the most specific and directly answers the question. It also has a high confidence score because it is clear that a good educational quality assurance system would lead to community students of recognized quality.; Directly addresses quality assurance benefits through education management.; This option directly links educational quality assurance to positive outcomes for community students.\nOption B: Mean score = 34, Rationales: While having a good relationship with the community is important, it doesn't necessarily reflect the benefits received from educational quality assurance. This answer has a low confidence score because it is less specific and doesn't directly address the question.; Reflects positive interaction but not necessarily the outcome of quality assurance.; While a good relationship is beneficial, it doesn't inherently reflect the impact of education quality assurance.\nOption C: Mean score = 64, Rationales: This answer partially answers the question by saying that the school manages education to meet community needs. However, it doesn't mention the role of quality assurance in this process. This answer has a moderate confidence score because it provides some information but isn't as specific as A.; Indicates meeting community needs, which is a part of quality assurance benefits.; This option highlights how the school's efforts align with community needs, a key benefit.\nOption D: Mean score = 71, Rationales: While all three options (A, B, and C) provide some information, they don't fully address the question. Option D also has the lowest confidence score because it is a combination of the other three options, which can make it less clear and specific.; Combines multiple valid points, including A and C, suggesting comprehensive coverage.; Option D is too broad and doesn't emphasize the specific benefits tied to educational quality assurance."
+  },
+  {
+    "question_id": 28,
+    "aggregated_scores": {
+      "A": 31.6,
+      "B": 81.8,
+      "C": 72.2,
+      "D": 13.8
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 81.8,
+      "consensus_sd": 3.1
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 31, Rationales: While the number of school personnel may be relevant to some aspects of school quality, it is not directly used in evaluating overall school performance.; Involves quantitative data but lacks direct evaluation of school quality.; While staff-to-student ratios can be a factor, the number of personnel alone doesn't directly measure school quality.\nOption B: Mean score = 78, Rationales: The percentage of students achieving learning outcomes is a key metric in assessing school quality. This reflects how well students are performing and achieving their goals.; Directly correlates with educational outcomes and can reflect school performance effectively.; Achievement rates are a key metric used to gauge how effectively schools are educating students.\nOption C: Mean score = 73, Rationales: Individual student academic achievement results provide valuable information about the effectiveness of teaching and learning within classrooms, but they don't necessarily reflect the overall quality of the school as a whole.; Shows individual student success directly linked to school education, indicative of overall quality.; Individual student scores contribute to overall school performance data but aren't the sole indicator of quality.\nOption D: Mean score = 14, Rationales: The names of school board members attending meetings are not related to evaluating school quality.; Subjective and not quantitatively tied to school performance or quality.; School board member attendance is an administrative detail not directly tied to educational quality."
+  },
+  {
+    "question_id": 29,
+    "aggregated_scores": {
+      "A": 82,
+      "B": 65.6,
+      "C": 73.6,
+      "D": 77
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 82,
+      "consensus_sd": 5.7
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 75, Rationales: Option A is the most appropriate use of school quality assessment results as it helps to communicate and raise awareness among staff members. Option B is also suitable because all personnel can utilize basic information from these assessments to create various projects.; Only partially covers the uses effectively mentioned in the options.; Administrators using results for staff meetings and as basic info for projects aligns with communication and data-driven decision making.\nOption B: Mean score = 68, Rationales: Option B is the most appropriate use of school quality assessment results as it provides all personnel with essential information to create projects. Option C is suitable because administrators can compile these records for future references.; Doesn't emphasize staff meetings and individual project creation as significant applications.; While compiling school records is relevant, using assessment results primarily for project creation seems less direct.\nOption C: Mean score = 73, Rationales: Option A is the most appropriate use of school quality assessment results as it allows administrators to communicate and raise awareness during staff meetings. Option D is also suitable because it includes all options mentioned in the question.; Properly identifies both communication purposes during meetings and record keeping by administrators.; Communicating during staff meetings and recording results are valid uses, but project creation might not be the most effective application.\nOption D: Mean score = 78, Rationales: Option A is the most appropriate use of school quality assessment results as it helps to communicate and raise awareness among staff members. Option B is suitable because all personnel can utilize basic information from these assessments to create various projects. Administrators can compile these records for future references (Option C) and also use them to communicate and raise awareness during staff meetings (Option A).; Overstates the importance of each individual use, not emphasizing distinct roles they serve.; All options have some merit, but the emphasis on specific applications makes a singular best choice more suitable."
+  },
+  {
+    "question_id": 30,
+    "aggregated_scores": {
+      "A": 83,
+      "B": 39,
+      "C": 22,
+      "D": 70
+    },
+    "winner": {
+      "choice": "A",
+      "mean_score": 83,
+      "consensus_sd": 7.6
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 87, Rationales: The statement is partially correct as quality assurance systems can be audited. However, it does not necessarily mean that administrators are fully responsible for developing learners to their full potential or creating a collaborative working culture.; Systematic management and auditability support educational quality.; Administrators are often held accountable for the quality of education and this involves systematic management practices that can be reviewed.\nOption B: Mean score = 42, Rationales: This statement is incorrect. Educational quality assurance focuses on improving the overall effectiveness of education rather than fully developing learners to their potential.; Potential development in learners may not be fully achieved or measurable.; While educational quality assurance aims to support learners' development, it cannot guarantee that every learner will reach their full potential due to individual factors.\nOption C: Mean score = 20, Rationales: The statement is partially correct as teachers responsible for quality assurance may receive recognition and professional development opportunities. However, it does not necessarily mean that they automatically gain higher professional ranks.; Quality assurance roles do not inherently lead to higher professional ranks.; Educational quality assurance focuses on improving overall processes and standards, not necessarily automatic promotions for teachers.\nOption D: Mean score = 68, Rationales: This statement is partially correct as a collaborative working culture can be fostered through educational quality assurance. However, it does not necessarily mean that schools develop this specific type of culture solely through quality assurance.; Collaborative culture promotes quality improvement but is not exclusive to quality assurance.; Quality assurance often promotes collaboration among staff, stakeholders, and even learners to enhance the educational experience."
   }
 ]

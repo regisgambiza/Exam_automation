@@ -16,9 +16,13 @@ class OllamaMCQAnalyzer:
         """Initialize with Ollama endpoint and model list."""
         self.endpoint = "http://localhost:11434/api/generate"
         self.models = [
-            "llama3.1:8b", "gemma2:9b", "qwen2:7b-instruct-q4_0", 
-            "mistral:7b-instruct-q4_0", "phi3:latest"
-        ]
+                        "mistral:7b-instruct-q4_0",
+                        "qwen2:7b-instruct-q4_0",
+                        "gemma2:9b",
+                        "llama3.1:8b",
+                        "nous-hermes2:10.7b",   
+                    ]
+
         self.system_prompt = """
 You are an expert MCQ analyst. For the question below, give:
 1) A numeric confidence for each option A, B, C, D on a 0-100 scale (integers).
@@ -79,32 +83,50 @@ Only output the JSON. Ensure the scores are integers 0-100.
         """Call a model for Round 2 re-evaluation with a summary of Round 1."""
         logging.info(f"Processing question {question_id} with model {model_name} (Round 2)")
         prompt = f"""
-Question: {question}
-A) {options[0]}
-B) {options[1]}
-C) {options[2]}
-D) {options[3]}
+    Question: {question}
+    A) {options[0]}
+    B) {options[1]}
+    C) {options[2]}
+    D) {options[3]}
 
-Round 1 Summary: {summary}
-"""
+    Round 1 Summary: {summary}
+    """
         payload = {
             "model": model_name,
             "prompt": f"{self.rebuttal_prompt.strip()}\n\n{prompt.strip()}",
             "stream": False
         }
-        try:
-            response = requests.post(self.endpoint, json=payload, timeout=60)
-            response.raise_for_status()
-            data = response.json()
-            txt = data.get("response", "")
-            start = txt.find('{')
-            end = txt.rfind('}') + 1
-            return json.loads(txt[start:end])
-        except Exception as e:
-            logging.error(f"Failed to call {model_name} for question {question_id} (Round 2): {e}")
-            return {"scores": {"A": 0, "B": 0, "C": 0, "D": 0},
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(self.endpoint, json=payload, timeout=60)
+                response.raise_for_status()
+                data = response.json()
+                txt = data.get("response", "")
+                start = txt.find('{')
+                end = txt.rfind('}') + 1
+                if start == -1 or end <= start:
+                    raise ValueError(f"No JSON object found in output: {txt}")
+                return json.loads(txt[start:end])
+            except (ValueError, json.JSONDecodeError) as e:
+                logging.error(f"Failed to parse JSON for {model_name} on question {question_id} (attempt {attempt + 1}/{max_retries}): {e}")
+                if attempt < max_retries - 1:
+                    logging.info("Retrying after 5s")
+                    time.sleep(5)
+                    continue
+                logging.error(f"Max retries reached for {model_name} on question {question_id}")
+                return {
+                    "scores": {"A": 0, "B": 0, "C": 0, "D": 0},
                     "rebuttal": "",
-                    "final": {"choice": "A", "confidence": 0}}
+                    "final": {"choice": "A", "confidence": 0}
+                }
+            except Exception as e:
+                logging.error(f"Failed to call {model_name} for question {question_id} (Round 2): {e}")
+                return {
+                    "scores": {"A": 0, "B": 0, "C": 0, "D": 0},
+                    "rebuttal": "",
+                    "final": {"choice": "A", "confidence": 0}
+                }
 
     def _aggregate_results(self, results: List[Dict], round_num: int = 1) -> Dict:
         options = ["A", "B", "C", "D"]
