@@ -125,16 +125,26 @@ class SimpleGreedyExamSolver:
                     "options": options
                 }
                 logging.debug(f"Retrieved Q{q_idx + 1}: {question_text} with {len(options)} options")
-                if q_idx < self.num_questions - 1:
+                if q_idx < self.num_questions - 1:  # Avoid clicking 'Next >' on the last question
                     try:
-                        page.get_by_role('button', name='Next >').click(timeout=2000)  # Increased timeout
-                        page.wait_for_timeout(1000)  # Increased wait
+                        # Select a dummy answer to enable 'Next >' if required
+                        page.locator("div.col-12 button").nth(0).click(timeout=2000)  # Clicks option 1
+                        logging.debug("Selected dummy answer option 1 to proceed")
+                        page.get_by_role('button', name='Next >').click(timeout=2000)
+                        page.wait_for_timeout(1000)
                     except Exception as e:
-                        logging.error(f"Failed to click 'Next >' for Q{q_idx + 1}: {e}")
+                        logging.error(f"Failed to select answer or click 'Next >' for Q{q_idx + 1}: {e}")
                         break
             with open(self.questions_file, "w") as f:
                 json.dump(questions_data, f, indent=2)
             logging.info(f"Saved {len(questions_data)} questions to {self.questions_file}")
+            # Reset to first question to start cracking
+            try:
+                logging.info("Resetting to first question for cracking phase")
+                self.restart_exam(page)  # Call restart_exam to reset page state
+                page.wait_for_load_state("networkidle", timeout=30000)
+            except Exception as e:
+                logging.error(f"Failed to reset exam page for cracking: {e}")
         except Exception as e:
             logging.error(f"Failed to retrieve questions: {e}")
         return questions_data

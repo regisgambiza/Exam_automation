@@ -1,0 +1,34 @@
+[
+  {
+    "question_id": 1,
+    "aggregated_scores": {
+      "A": 69,
+      "B": 73.8,
+      "C": 86.2,
+      "D": 35.6
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 86.2,
+      "consensus_sd": 4.6
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 65, Rationales: Option A is not a main purpose of educational quality assurance as it focuses on student and community satisfaction rather than evaluating the effectiveness of educational management.; While community satisfaction is a positive outcome of quality education, it's not the primary focus of assurance.; Satisfaction might not be a core purpose of quality assurance; it seems more related to outcomes rather than the process.\nOption B: Mean score = 69, Rationales: Option B aligns with the principles of educational quality assurance, which emphasizes context-specific solutions for schools.; Developing context-specific management strategies aligns with ensuring educational relevance and effectiveness.; While important, management might not be the primary focus of quality assurance processes which typically emphasize standards and outcomes.\nOption C: Mean score = 82, Rationales: Option C is a key aspect of quality assurance, allowing agencies to make informed decisions based on performance data.; Accreditation and performance reporting are core functions of supervisory agencies in quality assurance.; Acknowledging performance results aligns with key aspects of educational quality assurance.\nOption D: Mean score = 40, Rationales: Option D is not typical of quality assurance practices, as they aim for continuous improvement rather than passing or failing evaluations.; Quality assurance aims to assess and improve systems, not simply label schools as 'passing' or 'failing'.; Evaluating management might indicate a focus on administrative efficiency over educational content or student learning outcomes."
+  },
+  {
+    "question_id": 2,
+    "aggregated_scores": {
+      "A": 58,
+      "B": 58.6,
+      "C": 70.4,
+      "D": 55.6
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 70.4,
+      "consensus_sd": 39.6
+    },
+    "rationales": null,
+    "round1_summary": "Option A: Mean score = 77, Rationales: This option implies autonomy from external standards, which is a key aspect of an internal quality assurance system.; While schools have autonomy, a key part of quality assurance is aligning with broader educational goals and standards, not simply setting independent ones.; Setting own standards may conflict with Ministry's requirements.\nOption B: Mean score = 76, Rationales: Preparing a school development plan is often part of implementing an educational quality assurance system to set long-term goals.; School development plans are essential for outlining long-term improvement strategies, but they don't directly constitute the implementation of an internal quality assurance system.; Developing a plan is crucial for strategic direction.\nOption C: Mean score = 89, Rationales: Appointing knowledgeable individuals is crucial for establishing and maintaining a quality assurance system within the school.; Appointing dedicated individuals to oversee quality assurance is a fundamental step in establishing a robust internal system.; Expert involvement ensures effective system implementation.\nOption D: Mean score = 68, Rationales: The ability to adjust projects/activities as needed aligns with the flexibility required in implementing a dynamic quality assurance system.; Flexibility in project adjustments is important for responsiveness, but it's not a defining characteristic of a formalized quality assurance system.; Flexibility in annual plans might compromise quality assurance."
+  }
+]

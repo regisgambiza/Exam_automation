@@ -1,0 +1,90 @@
+[
+  {
+    "question_id": 1,
+    "aggregated_scores": {
+      "A": 56,
+      "B": 71,
+      "C": 82,
+      "D": 69
+    },
+    "winner": {
+      "choice": "C",
+      "mean_score": 82,
+      "consensus_sd": 12.5
+    },
+    "rationales": {
+      "A": [
+        "Creating satisfaction is not a primary goal of educational quality assurance, as its main focus is on improving educational standards.",
+        "While satisfaction is a positive outcome, it's not the primary focus of educational quality assurance.",
+        "Satisfaction for the community and society is a part of the purpose but not its main focus.",
+        "Option A is not a main purpose of educational quality assurance because it focuses on the satisfaction of the community and society rather than on the actual quality of education. This can be achieved through other means such as student feedback and parent satisfaction surveys.",
+        "While community satisfaction is an outcome of good education quality assurance, it's not a primary purpose."
+      ],
+      "B": [
+        "Developing educational management based on the school's context is indeed a purpose of quality assurance, allowing for tailored approaches to meet unique needs.",
+        "Tailoring management to context is crucial for effective implementation of quality assurance measures.",
+        "Developing educational management based on context supports quality assurance but may not be considered its primary goal.",
+        "Option B is a main purpose of educational quality assurance as it involves developing educational management based on the school's context which allows for the adaptation and improvement of the quality of education to meet the needs of the community.",
+        "Creating educational management tailored to the school\u2019s context supports effective teaching and learning but isn't stated as a main goal for QA purposes directly."
+      ],
+      "C": [
+        "This option aligns with the role of supervisory agencies in monitoring and acknowledging performance results, which is an essential aspect of quality assurance.",
+        "Performance recognition by supervisory agencies is a common result and purpose of quality assurance.",
+        "Acknowledging performance results aligns closely with the core objectives of educational quality assurance.",
+        "Option C is a main purpose of educational quality assurance as it allows supervisory agencies to acknowledge the performance results of schools under their jurisdiction, which helps to ensure that the quality of education is monitored and maintained.",
+        "QA involves recognizing performance results which is part of its function in ensuring accountability within education systems."
+      ],
+      "D": [
+        "Evaluating whether the school's educational management passes or fails aligns closely with the overall objective of quality assurance, to improve standards.",
+        "Quality assurance aims for improvement, not simple 'pass/fail' judgments on educational management.",
+        "Evaluating school management can be a part of quality assurance, but it focuses more on processes than outcomes.",
+        "Option D is not a main purpose of educational quality assurance because it focuses on evaluating whether the school's educational management passes or fails, rather than on improving the quality of education itself.",
+        "Evaluating educational management success or failure against standards, policies, and practices is central to the concept of quality assurance."
+      ]
+    }
+  },
+  {
+    "question_id": 2,
+    "aggregated_scores": {
+      "A": 83,
+      "B": 84,
+      "C": 83,
+      "D": 50
+    },
+    "winner": {
+      "choice": "B",
+      "mean_score": 84,
+      "consensus_sd": 8.2
+    },
+    "rationales": {
+      "A": [
+        "Setting own educational standards without government oversight is not typical of implementing an internal quality assurance system.",
+        "Setting internal standards is a part of defining the school's educational philosophy, but it doesn't directly relate to quality assurance implementation.",
+        "Sets own standards implies self-regulation but does not guarantee alignment with broader educational goals.",
+        "This statement is not specific to implementing an internal educational quality assurance system within a school.",
+        "The option allows a school to maintain its own educational standards while still aligning with national expectations."
+      ],
+      "B": [
+        "Preparing a development plan aligns with ongoing improvement and evaluation in QA systems.",
+        "A development plan outlining long-term goals and strategies is essential for aligning educational efforts and improving quality.",
+        "Long-term planning ensures sustainability and strategic direction in education quality improvement.",
+        "While preparing a school development plan is important for the overall improvement of the school, it does not specifically relate to quality assurance.",
+        "This is necessary for setting clear long-term goals but not directly related to the immediate implementation of an assurance system."
+      ],
+      "C": [
+        "Appointing competent individuals is crucial for establishing a reliable QA system.",
+        "Identifying dedicated individuals responsible for establishing and managing the quality assurance system is crucial for its effectiveness.",
+        "Appointing knowledgeable individuals for quality assurance indicates a commitment to excellence and compliance.",
+        "Appointing knowledgeable and competent individuals responsible for establishing the school\u2019s quality assurance system is a crucial aspect of implementing an internal educational quality assurance system within a school.",
+        "While important, this choice does not specify actions that are part of implementing a quality assurance system; it's more about governance and oversight. "
+      ],
+      "D": [
+        "Flexibility to adjust plans as needed is actually a key aspect of most quality assurance systems.",
+        "Flexibility in adjusting operational plans based on feedback and changing needs supports a continuous improvement approach, which aligns with quality assurance.",
+        "Flexibility in operational plans can lead to inconsistency or neglect of agreed-upon standards.",
+        "While projects/activities listed in the annual operational plan can be adjusted as needed, this does not specifically relate to quality assurance.",
+        "Adjusting activities as needed is flexible but doesn't directly contribute to setting up the internal educational quality assurance framework."
+      ]
+    }
+  }
+]
